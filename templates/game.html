@@ -1,0 +1,84 @@
+<div class="gamemenu">
+	<ul>
+		<li><a href="" class="pinpointDefect" ng-click="pinpointDefect()">Pin</a></li>
+		<li><a href="" class="{{minorDefect}}" ng-click="setMinor()">Minor</a></li>
+		<li><a href="" class="{{majorDefect}}" ng-click="setMajor()">Major</a></li>
+		<li><div id="dropdown">
+			    <!-- trigger button -->
+			    <button>Type <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></button>
+			    <!-- dropdown menu -->
+			    <ul id="dropdown-menu">
+			        <li><a href="" ng-click="selectType('Erro1')">Erro1</a></li>
+			        <li><a href="" ng-click="selectType('Erro2')">Erro2</a></li>
+			        <li><a href="" ng-click="selectType('Erro3aaaaaaaaaaaaaaaaaaaaaaaa')">Erro3</a></li>
+			    </ul>
+			</div>
+		</li>
+	</ul>
+</div>
+<div class="sidemenu">
+
+		<h3 ng-if="selectedType != ''">Selected Type</h3>
+		<div id="selectedtype" ng-if="selectedType != ''">{{selectedType}}</div>
+	<div>
+		<h1>Title</b></h1>
+		<h3>Teacher</h3>
+	</div>
+	<div>
+		<h2>Time - {{hours}}:{{minutes}}:{{seconds}}</h2>
+		<ul>
+			<li><a ng-click="confirmEnd()" class="btn btn-info btn-lg">Done</a></li>
+		</ul>
+		<h2>Found</h2>
+		<div class="listofdefects">
+			<ul>
+				<li ng-repeat="defect in defects" ng-class="{minorDefectListed: defect.type == 0, majorDefectListed: defect.type == 1}">
+					<table><tr><td ng-class="defectcell"><a href="" ng-click="jumpToDefect(defect.id)">{{defect.description}}</a></td><td ng-class="removecell"><a ng-click="removeDefect(defect.id)" href="">X</a></td></tr></table>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+<div class="game">
+<pre id="code">package esof.utils;
+
+/**
+ * Represents a node in a linked list of values (objects) of type T.
+*/
+
+public class Node<T> {
+	private T value;
+	private Node<T> nextNode;	
+
+	/**
+	 * Creates a new node containing a value "x".
+	 * Should only be called from LinkedList.
+	 */
+	Node(T x) { 
+		value = x;
+		nextNode = null;
+	}
+	
+	/**
+	 * Sets the next node.
+	 * Should only be called from LinkedList.
+	 */
+	void setNextNode(Node<T> nextNode) {
+		this.nextNode = nextNode; 
+	}
+
+	/**
+	 * Retrieves the value stored in this node.
+	 */
+	public T getValue(){
+		return value;
+	}
+
+	/**
+	 * Retrieves the next node (null if there is none).
+	 */
+	public Node<T> getNextNode(){
+		return nextNode;
+	}
+}</pre>
+</div>

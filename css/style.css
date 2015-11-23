@@ -1,0 +1,248 @@
+html, body {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.sidemenu {
+    float: left;
+    width: 20%;
+    background-color: #6495ed;
+    color: white;
+    font-weight: bold;
+    height: 700px;
+}
+
+.sidemenu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidemenu li {
+    padding: 0;
+}
+
+.sidemenu a:link, a:visited {
+    display: block;
+    font-weight: bold;
+    padding: 5px;
+    text-decoration: none;
+    color: white;
+}
+
+.sidemenu a:hover, a:active {
+    background-color: white;
+    color: blue;
+    text-shadow: none; 
+}
+
+.listofdefects {
+    overflow-y: auto;
+}
+
+.minorDefectListed {
+    border: 2px solid #FFF000;
+}
+
+.majorDefectListed {
+    border: 2px solid red;
+}
+
+.sidemenu h1 {
+    text-align: center;
+    text-shadow:
+    -1px -1px 0 blue,
+    1px -1px 0 blue,
+    -1px 1px 0 blue,
+    1px 1px 0 blue;
+    font-weight: bold;
+}
+
+.sidemenu h2 {
+    font-weight: bold;
+}
+
+.sidemenu h3 {
+    text-align: center;
+    font-weight: bold;
+}
+
+.sidemenu div {
+    padding: 10px;
+}
+
+table {
+    width: 100%;
+}
+
+tr {
+    width: 100%;
+    height: 100%;
+}
+
+.defectcell {
+    width: 90%;
+    vertical-align: center;
+}
+
+.removecell {
+    width: 10%;
+    height: 100%;
+    text-align: center;
+    vertical-align: center;
+}
+
+#selectedtype {
+    text-align: center;
+}
+
+.gamemenu {
+	text-align: center;
+	vertical-align: center;
+	background-color: blue;
+}
+
+.gamemenu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.gamemenu li {
+    float: left;
+}
+
+.gamemenu a:link, a:visited {
+    display: block;
+    width: 150px;
+    font-weight: bold;
+    text-align: center;
+    padding: 15px;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: white;
+}
+
+.gamemenu a:hover, a:active {
+    background-color: white;
+    color: blue;
+    text-shadow: none; 
+}
+
+.testediv {
+    border: 1px solid orange;
+    padding: 0px;
+}
+
+.selectedMinorDefect {
+    color: white;
+    text-shadow:
+    -1px -1px 0 #FFD700,
+    1px -1px 0 #FFD700,
+    -1px 1px 0 #FFD700,
+    1px 1px 0 #FFD700; 
+    background-color: #FFF000;
+}
+
+.selectedMajorDefect {
+    color: white;
+    text-shadow:
+    -1px -1px 0 red,
+    1px -1px 0 red,
+    -1px 1px 0 red,
+    1px 1px 0 red;
+    background-color: red;
+}
+
+.unselectedMenuOption {
+    color: white;
+    background-color: blue;
+}
+
+.pinpointDefect {
+    color: white;
+    background-color: green;
+}
+
+.game {
+    margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px;
+}
+
+pre {
+    white-space: pre-wrap;
+    padding: 20px;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 0px;
+    font-size: 16px;
+    height: 700px;
+    overflow-y: auto;
+    margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px;
+}
+
+#dropdown {
+    position: absolute;
+    display: inline-block;
+}
+
+#dropdown #dropdown-menu {
+    position: absolute;
+    top: 100%;
+    display: none;
+    margin: 0;
+    list-style: none; 
+    width: 100%; 
+    padding: 0;
+    background-color: white;
+    color: blue;
+}
+
+#dropdown:hover #dropdown-menu {
+    display: block;
+}
+
+/** Button Styles **/
+#dropdown button {
+    display: block;
+    width: 150px;
+    font-weight: bold;
+    text-align: center;
+    padding: 15px;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: white;
+    background-color: blue;
+    border: none;
+    margin: 0;
+}
+
+/** List Item Styles **/
+#dropdown a {
+    display: block;
+    font-weight: bold;
+    text-align: left;
+    padding: 15px;
+    text-decoration: none;
+    text-transform: none;
+    color: blue;
+}
+
+/** List Item Hover Styles **/
+#dropdown a:hover {
+    background-color: #CCCCCC;
+    color: blue;
+    text-shadow: none; 
+}
+
+.mark {
+    background: rgba(0, 255, 255, 0.3);
+}
+
+.currentmark {
+    background: rgba(0, 255, 255, 0.7);
+}
+
+.testemark {
+    background: orange;
+}
