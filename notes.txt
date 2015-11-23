@@ -1,0 +1,2 @@
+Remove unnecessary highlights
+- for each mark verify if id is null or vice versa
