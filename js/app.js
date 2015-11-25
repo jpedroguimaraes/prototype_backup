@@ -86,7 +86,7 @@ var app = angular.module('prototype', ['ngRoute'])
   }  
 
   function resultCtrl ($scope, $routeParams) {
-      $scope.cenas = "LOL123";
+      $scope.resultValue = "100";
   }
 
   function gameCtrl ($scope, $interval, $routeParams, $window, gameSetup, defectList, Defect) {

@@ -168,7 +168,7 @@ tr {
     margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px;
 }
 
-pre {
+.game pre {
     white-space: pre-wrap;
     padding: 20px;
     background-color: black;
@@ -247,39 +247,60 @@ pre {
     background: orange;
 }
 
-.comparison {
-    width: 100%;
-    padding: 0px;
-    margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px;
-}
-
-.sidemenu ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-
-.sidemenu li {
-    padding: 0;
-}
-
 .rating {
     width: 100%;
     padding: 10px;
     background: blue;
     color: white;
     text-align: center;
+    font-weight: bold;
 }
 
-#showsolutiondefects {
-    width: 45%;
+.rating h1 {
+    font-weight: bold;
 }
 
-#showanswereddefects {
-    width: 45%;
+.comparison {
+    width: 100%;
+    padding: 0px;
+    margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px;
+}
+
+.comparison table tr {
+    padding: 0px;
+    margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px;
+}
+
+.comparison td {
+    padding: 0px;
+    margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px;
+    border: 5px solid #00AAFF;
+}
+
+.comparison pre {
+    width: 100%;
+    white-space: pre-wrap;
+    padding: 20px;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 0px;
+    font-size: 16px;
+    height: 700px;
+    overflow-y: auto;
+    margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px;
 }
 
 .login {
     width: 50%;
     margin: 0 auto;
+}
+
+.gamelist {
+    width: 50%;
+    margin: 0 auto;
+}
+
+.listedgame a {
+    color: black;
 }

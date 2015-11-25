@@ -1,8 +1,48 @@
-<div class="rating">Your result is: 98%</div>
+<div class="rating"><h1>Your result is {{resultValue}}%</h1></div>
 <div class="comparison">
-		<ul>
-			<li>
-				<pre id="showsolutiondefects">package esof.utils;
+<table>
+<tr>
+<td><pre id="showsolutiondefects">package esof.utils;
+
+/**
+ * Represents a node in a linked list of values (objects) of type T.
+*/
+
+public class Node<T> {
+	private T value;
+	private Node<T> nextNode;	
+
+	/**
+	 * Creates a new node containing a value "x".
+	 * Should only be called from LinkedList.
+	 */
+	Node(T x) { 
+		value = x;
+		nextNode = null;
+	}
+	
+	/**
+	 * Sets the next node.
+	 * Should only be called from LinkedList.
+	 */
+	void setNextNode(Node<T> nextNode) {
+		this.nextNode = nextNode; 
+	}
+
+	/**
+	 * Retrieves the value stored in this node.
+	 */
+	public T getValue(){
+		return value;
+	}
+
+	/**
+	 * Retrieves the next node (null if there is none).
+	 */
+	public Node<T> getNextNode(){
+		return nextNode;
+	}
+}</pre></td/><td><pre id="showanswereddefects">package esof.utils;
 
 /**
  * Represents a node in a linked list of values (objects) of type T.
@@ -43,49 +83,7 @@ public class Node<T> {
 		return nextNode;
 	}
 }</pre>
-			</li>
-			<li>
-				<pre id="showanswereddefects">package esof.utils;
-
-/**
- * Represents a node in a linked list of values (objects) of type T.
-*/
-
-public class Node<T> {
-	private T value;
-	private Node<T> nextNode;	
-
-	/**
-	 * Creates a new node containing a value "x".
-	 * Should only be called from LinkedList.
-	 */
-	Node(T x) { 
-		value = x;
-		nextNode = null;
-	}
-	
-	/**
-	 * Sets the next node.
-	 * Should only be called from LinkedList.
-	 */
-	void setNextNode(Node<T> nextNode) {
-		this.nextNode = nextNode; 
-	}
-
-	/**
-	 * Retrieves the value stored in this node.
-	 */
-	public T getValue(){
-		return value;
-	}
-
-	/**
-	 * Retrieves the next node (null if there is none).
-	 */
-	public Node<T> getNextNode(){
-		return nextNode;
-	}
-}</pre>
-			</li>
-		</ul>
-</div>	
+</td>
+</tr>
+</table>
+</div>
