@@ -238,7 +238,11 @@ var app = angular.module('prototype', ['ngRoute'])
       }
 
       $scope.confirmEnd = function () {
-          
+          $.get("http://127.0.0.1:8080/user",
+            {id: $scope.gameID},
+            function(data){
+              alert("login success: " + data + "!");
+          });
       }
 
       $scope.end = function () {
