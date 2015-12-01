@@ -238,7 +238,8 @@ var app = angular.module('prototype', ['ngRoute'])
       }
 
       $scope.confirmEnd = function () {
-          $http.get('http://127.0.0.1/users').success(function (data){
+          $http.get('http://127.0.0.1:8000/users', { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}})
+            .success(function (data){
                 alert("Success");
             }).error(function (data, status){
                 alert("Error status : " + status);
