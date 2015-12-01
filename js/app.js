@@ -89,7 +89,7 @@ var app = angular.module('prototype', ['ngRoute'])
       $scope.resultValue = "100";
   }
 
-  function gameCtrl ($scope, $interval, $routeParams, $window, gameSetup, defectList, Defect) {
+  function gameCtrl ($scope, $interval, $routeParams, $window, $http, gameSetup, defectList, Defect) {
       //var result = document.getElementById('code');
       //alert(result);
 
@@ -238,11 +238,11 @@ var app = angular.module('prototype', ['ngRoute'])
       }
 
       $scope.confirmEnd = function () {
-          $.get("http://127.0.0.1:8080/user",
-            {id: $scope.gameID},
-            function(data){
-              alert("login success: " + data + "!");
-          });
+          $http.get('http://127.0.0.1/users').success(function (data){
+                alert("Success");
+            }).error(function (data, status){
+                alert("Error status : " + status);
+            });
       }
 
       $scope.end = function () {
