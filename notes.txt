@@ -1,2 +1,10 @@
 Remove unnecessary highlights
 - for each mark verify if id is null or vice versa
+
+- remove span nodes
+
+local storage
+http://plnkr.co/edit/o4w3VGqmp8opfrWzvsJy?p=preview
+http://plnkr.co/edit/3vfRkvG7R9DgQxtWbGHz?p=preview
+
+new team final review page (adaptation of game page)
