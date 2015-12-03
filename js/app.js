@@ -110,10 +110,25 @@ var app = angular.module('prototype', ['ngRoute'])
   });*/
 
   function homeCtrl ($scope, $location, cacheService) {
+      try {
+        if(cacheService.get("user") && (cacheService.get("user") != null) || (cacheService.get("user") != undefined)) {
+          $scope.id = cacheService.get("user");
+          alert("all ok");
+        } else {
+          alert("ok, but not set");
+          $location.path("/login");
+        }
+      } catch (err) {
+        alert("error");
+        $location.path("/login");
+      }
       $scope.goToGame = function() {
           $location.path("/game/1");
       };
-    //cacheService.setData('city', city);
+      $scope.logout = function() {
+          cacheService.clearAll();
+          $location.path("/");
+      };
   }     
 
   function loginCtrl ($scope) {
