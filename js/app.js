@@ -22,6 +22,40 @@ var app = angular.module('prototype', ['ngRoute'])
       });
   });
 
+  app.factory('storageService', function ($rootScope) {
+      return { 
+          get: function (key) {
+             return JSON.parse(localStorage.getItem(key));
+          },
+          save: function (key, data) {
+             localStorage.setItem(key, JSON.stringify(data));
+          },
+          remove: function (key) {
+              localStorage.removeItem(key);
+          },
+          clearAll : function () {
+              localStorage.clear();
+          }
+      };
+  });
+
+  app.factory('cacheService', function ($http, storageService) {
+      return {
+          getData: function (key) {
+              return storageService.get(key);
+          },
+          setData: function (key,data) {
+              storageService.save(key, data);
+          },
+          removeData: function (key) {
+              storageService.remove(key);
+          },
+          clearAll: function () {
+              storageService.clearAll();
+          }
+      };
+  });
+
   app.factory('gameSetup', function () {
       return {
           load: function(id) { // load exercise from database
@@ -65,7 +99,7 @@ var app = angular.module('prototype', ['ngRoute'])
     return Defect;
   });
 
-  app.directive('scrollIf', function () {
+  /*app.directive('scrollIf', function () {
     return function (scope, element, attributes) {
       setTimeout(function () {
         if (scope.$eval(attributes.scrollIf)) {
@@ -73,12 +107,13 @@ var app = angular.module('prototype', ['ngRoute'])
         }
       });
     }
-  });
+  });*/
 
-  function homeCtrl ($scope, $location) {
+  function homeCtrl ($scope, $location, cacheService) {
       $scope.goToGame = function() {
           $location.path("/game/1");
-      }
+      };
+    //cacheService.setData('city', city);
   }     
 
   function loginCtrl ($scope) {
@@ -89,10 +124,8 @@ var app = angular.module('prototype', ['ngRoute'])
       $scope.resultValue = "100";
   }
 
-  function gameCtrl ($scope, $interval, $routeParams, $window, $http, gameSetup, defectList, Defect) {
-      //var result = document.getElementById('code');
-      //alert(result);
-
+  function gameCtrl ($scope, $interval, $routeParams, $window, $http, gameSetup, defectList, Defect, cacheService) {
+      
       $scope.gameID = $routeParams.id;
       $scope.gameDescription = gameSetup.load(2);
       $scope.wayOfTime = 0;
@@ -249,4 +282,5 @@ var app = angular.module('prototype', ['ngRoute'])
       $scope.end = function () {
           $scope.wayOfTime = 0;
       }
+      
   }
