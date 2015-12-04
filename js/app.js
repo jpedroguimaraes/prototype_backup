@@ -13,6 +13,10 @@ var app = angular.module('prototype', ['ngRoute'])
           controller: gameCtrl,
           templateUrl: 'templates/game.html'
       });
+      $routeProvider.when('/meeting/:id', {
+          controller: meetingCtrl,
+          templateUrl: 'templates/meeting.html'
+      });
       $routeProvider.when('/result/:id', {
           controller: resultCtrl,
           templateUrl: 'templates/result.html'
@@ -112,7 +116,7 @@ var app = angular.module('prototype', ['ngRoute'])
   function homeCtrl ($scope, $location, cacheService) {
       try {
         if(cacheService.get("user") && (cacheService.get("user") != null) || (cacheService.get("user") != undefined)) {
-          $scope.id = cacheService.get("user");
+          $scope.userid = cacheService.get("user");
           alert("all ok");
         } else {
           alert("ok, but not set");
@@ -131,16 +135,76 @@ var app = angular.module('prototype', ['ngRoute'])
       };
   }     
 
-  function loginCtrl ($scope) {
+  function loginCtrl ($scope, $location, cacheService) {
       $scope.cenas = "LOL123";
+      $scope.login = function() {
+          if($scope.username == "teste" && $scope.username == "teste") {
+              cacheService.set("user", "1");
+              $location.path("/");
+          } else {
+              alert("Login errado!");
+          }
+      };
   }  
+
+  function meetingCtrl ($scope, $interval, $routeParams, gameSetup) {
+      $scope.gameID = $routeParams.id;
+      $scope.gameDescription = gameSetup.load(2);
+      $scope.wayOfTime = 0;
+      if (true) { //check if countdown
+          $scope.time = 900;
+          $scope.timeGoal = 0;
+          $scope.wayOfTime = -1;
+      } else {
+          $scope.time = 0;
+          $scope.timeGoal = 900;
+          $scope.wayOfTime = 1;
+      }
+
+      $scope.setClock = function () {
+          var s = $scope.time % 60;
+          if (s < 10) {
+            s = '0' + s;
+          }
+          $scope.seconds = s;
+          var m = Math.floor($scope.time / 60);
+          var h = Math.floor(m / 60);
+          m = m % 60;
+          if (m < 10) {
+            m = '0' + m;
+          }
+          $scope.minutes = m;
+          $scope.hours = h;
+      };
+      $scope.setClock();
+      $scope.timer = function () {
+          $scope.time = $scope.time + $scope.wayOfTime;
+          $scope.setClock();
+          if ($scope.time == 0) {
+            $scope.end();
+          }
+      };
+      $interval($scope.timer, 1000);
+  }
 
   function resultCtrl ($scope, $routeParams) {
       $scope.resultValue = "100";
   }
 
-  function gameCtrl ($scope, $interval, $routeParams, $window, $http, gameSetup, defectList, Defect, cacheService) {
-      
+  function gameCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService) {
+      try {
+        if(cacheService.get("user") && (cacheService.get("user") != null) || (cacheService.get("user") != undefined)) {
+          $scope.userid = cacheService.get("user");
+          alert("all ok");
+        } else {
+          alert("ok, but not set");
+          $location.path("/login");
+        }
+      } catch (err) {
+        alert("error");
+        $location.path("/login");
+      }
+
       $scope.gameID = $routeParams.id;
       $scope.gameDescription = gameSetup.load(2);
       $scope.wayOfTime = 0;

@@ -1,0 +1,66 @@
+<div class="sidemenu">
+	<div>
+		<h1>Title</b></h1>
+		<h3>Teacher</h3>
+	</div>
+	<div class="chat">
+		<textarea>Teste</textarea>
+	</div>
+	<div>
+		<h2>Time - {{hours}}:{{minutes}}:{{seconds}}</h2>
+		<ul>
+			<li><a ng-click="confirmEnd()" class="btn btn-info btn-lg">Done</a></li>
+		</ul>
+		<h2>Found</h2>
+		<div class="listofdefects">
+			<ul>
+				<li ng-repeat="defect in defects" ng-class="{minorDefectListed: defect.type == 0, majorDefectListed: defect.type == 1}">
+					<table><tr><td ng-class="defectcell"><a href="" ng-click="jumpToDefect(defect.id)">{{defect.description}}</a></td><td ng-class="removecell"><a ng-click="removeDefect(defect.id)" href="">X</a></td></tr></table>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+<div class="game">
+<pre id="code">package esof.utils;
+
+/**
+ * Represents a node in a linked list of values (objects) of type T.
+*/
+
+public class Node<T> {
+	private T value;
+	private Node<T> nextNode;	
+
+	/**
+	 * Creates a new node containing a value "x".
+	 * Should only be called from LinkedList.
+	 */
+	Node(T x) { 
+		value = x;
+		nextNode = null;
+	}
+	
+	/**
+	 * Sets the next node.
+	 * Should only be called from LinkedList.
+	 */
+	void setNextNode(Node<T> nextNode) {
+		this.nextNode = nextNode; 
+	}
+
+	/**
+	 * Retrieves the value stored in this node.
+	 */
+	public T getValue(){
+		return value;
+	}
+
+	/**
+	 * Retrieves the next node (null if there is none).
+	 */
+	public Node<T> getNextNode(){
+		return nextNode;
+	}
+}</pre>
+</div>
