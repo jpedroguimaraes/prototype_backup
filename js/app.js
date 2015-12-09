@@ -48,7 +48,7 @@ var app = angular.module('prototype', ['ngRoute'])
           getData: function (key) {
               return storageService.get(key);
           },
-          setData: function (key,data) {
+          setData: function (key, data) {
               storageService.save(key, data);
           },
           removeData: function (key) {
@@ -103,28 +103,15 @@ var app = angular.module('prototype', ['ngRoute'])
     return Defect;
   });
 
-  /*app.directive('scrollIf', function () {
-    return function (scope, element, attributes) {
-      setTimeout(function () {
-        if (scope.$eval(attributes.scrollIf)) {
-          window.scrollTo(0, element[0].offsetTop - 100)
-        }
-      });
-    }
-  });*/
-
   function homeCtrl ($scope, $location, cacheService) {
       try {
-        if(cacheService.get("user") && (cacheService.get("user") != null) || (cacheService.get("user") != undefined)) {
-          $scope.userid = cacheService.get("user");
-          alert("all ok");
-        } else {
-          alert("ok, but not set");
-          $location.path("/login");
-        }
+          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
+              $scope.user = cacheService.getData("user");
+          } else {
+              $location.path("/login");
+          }
       } catch (err) {
-        alert("error");
-        $location.path("/login");
+          $location.path("/login");
       }
       $scope.goToGame = function() {
           $location.path("/game/1");
@@ -136,10 +123,14 @@ var app = angular.module('prototype', ['ngRoute'])
   }     
 
   function loginCtrl ($scope, $location, cacheService) {
-      $scope.cenas = "LOL123";
+      try {
+          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
+              $location.path("/");
+          }
+      } catch (err) { }
       $scope.login = function() {
           if($scope.username == "teste" && $scope.username == "teste") {
-              cacheService.set("user", "1");
+              cacheService.setData("user", "1");
               $location.path("/");
           } else {
               alert("Login errado!");
@@ -147,7 +138,16 @@ var app = angular.module('prototype', ['ngRoute'])
       };
   }  
 
-  function meetingCtrl ($scope, $interval, $routeParams, gameSetup) {
+  function meetingCtrl ($scope, $interval, $routeParams, gameSetup, $location, cacheService) {
+      try {
+          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
+              $scope.user = cacheService.getData("user");
+          } else {
+              $location.path("/login");
+          }
+      } catch (err) {
+          $location.path("/login");
+      }
       $scope.gameID = $routeParams.id;
       $scope.gameDescription = gameSetup.load(2);
       $scope.wayOfTime = 0;
@@ -160,18 +160,17 @@ var app = angular.module('prototype', ['ngRoute'])
           $scope.timeGoal = 900;
           $scope.wayOfTime = 1;
       }
-
-      $scope.setClock = function () {
+      $scope.setClock = function () { //passar para factory
           var s = $scope.time % 60;
           if (s < 10) {
-            s = '0' + s;
+              s = '0' + s;
           }
           $scope.seconds = s;
           var m = Math.floor($scope.time / 60);
           var h = Math.floor(m / 60);
           m = m % 60;
           if (m < 10) {
-            m = '0' + m;
+              m = '0' + m;
           }
           $scope.minutes = m;
           $scope.hours = h;
@@ -181,34 +180,41 @@ var app = angular.module('prototype', ['ngRoute'])
           $scope.time = $scope.time + $scope.wayOfTime;
           $scope.setClock();
           if ($scope.time == 0) {
-            $scope.end();
+              //$scope.end();
           }
       };
       $interval($scope.timer, 1000);
   }
 
-  function resultCtrl ($scope, $routeParams) {
+  function resultCtrl ($scope, $routeParams, $location, cacheService) {
+      try {
+          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
+              $scope.user = cacheService.getData("user");
+          } else {
+              $location.path("/login");
+          }
+      } catch (err) {
+          $location.path("/login");
+      }
       $scope.resultValue = "100";
   }
 
   function gameCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService) {
+      var w = $(window).width();
+      alert(w);
+      alert($('.container'));
       try {
-        if(cacheService.get("user") && (cacheService.get("user") != null) || (cacheService.get("user") != undefined)) {
-          $scope.userid = cacheService.get("user");
-          alert("all ok");
-        } else {
-          alert("ok, but not set");
-          $location.path("/login");
-        }
+          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
+              $scope.user = cacheService.getData("user");
+          } else {
+              $location.path("/login");
+          }
       } catch (err) {
-        alert("error");
-        $location.path("/login");
+          $location.path("/login");
       }
-
       $scope.gameID = $routeParams.id;
       $scope.gameDescription = gameSetup.load(2);
       $scope.wayOfTime = 0;
-
       if (true) { //check if countdown
           $scope.time = 3600;
           $scope.timeGoal = 0;
@@ -218,18 +224,17 @@ var app = angular.module('prototype', ['ngRoute'])
           $scope.timeGoal = 3600;
           $scope.wayOfTime = 1;
       }
-
       $scope.setClock = function () {
           var s = $scope.time % 60;
           if (s < 10) {
-            s = '0' + s;
+              s = '0' + s;
           }
           $scope.seconds = s;
           var m = Math.floor($scope.time / 60);
           var h = Math.floor(m / 60);
           m = m % 60;
           if (m < 10) {
-            m = '0' + m;
+              m = '0' + m;
           }
           $scope.minutes = m;
           $scope.hours = h;
@@ -239,18 +244,15 @@ var app = angular.module('prototype', ['ngRoute'])
           $scope.time = $scope.time + $scope.wayOfTime;
           $scope.setClock();
           if ($scope.time == 0) {
-            $scope.end();
+              $scope.end();
           }
       };
       $interval($scope.timer, 1000);
-
       $scope.defects = defectList.get();
       $scope.selectedType = "";
-
       $scope.defectType = -1;
       $scope.minorDefect = 'unselectedMenuOption';
       $scope.majorDefect = 'unselectedMenuOption';
-
       $scope.setMinor = function () {
           $scope.defectType = 0;
           $scope.minorDefect = 'selectedMinorDefect';
@@ -261,26 +263,20 @@ var app = angular.module('prototype', ['ngRoute'])
           $scope.majorDefect = 'selectedMajorDefect';
           $scope.minorDefect = 'unselectedMenuOption';
       }
-
       $scope.selectType = function (type) {
           $scope.selectedType = type;
       }
-
       $scope.dump = function (obj) {
           var out = '';
           for (var i in obj) {
               out += i + ": " + obj[i] + "\n";
           }
-
           alert(out);
-
           // or, if you wanted to avoid alerts...
-
           var pre = document.createElement('pre');
           pre.innerHTML = out;
           document.body.appendChild(pre)
       }
-
       $scope.pinpointDefect = function () {
           if ($scope.defectType == 0 || $scope.defectType == 1) {
               if($scope.selectedType != "" && $scope.selectedType != null) {
@@ -299,12 +295,10 @@ var app = angular.module('prototype', ['ngRoute'])
               alert('None');
           }
       }
-
       $scope.removeDefect = function (defectID) {
           defectList.remove(defectID);
           $('#' + defectID).attr("class", "");
       }
-
       $scope.getSelectionPosition = function () {
           var range = window.getSelection().getRangeAt(0);
           var preSelectionRange = range.cloneRange();
@@ -317,7 +311,6 @@ var app = angular.module('prototype', ['ngRoute'])
               text: range.toString()
           }
       }
-      
       $scope.markText = function(markInfo, defectID) {
           var selection = window.getSelection().getRangeAt(0);
           var selectedText = selection.extractContents();
@@ -335,7 +328,6 @@ var app = angular.module('prototype', ['ngRoute'])
               return null;
           }
       };
-  
       $scope.removeMarks = function() {
           $('.mark').each(function () {
               $(this).contents().unwrap();
@@ -344,22 +336,22 @@ var app = angular.module('prototype', ['ngRoute'])
               $(this).contents().unwrap();
           });
       }
-
       $scope.jumpToDefect = function (defectID) {
-          
+          //TODO
       }
-
       $scope.confirmEnd = function () {
-          $http.get('http://127.0.0.1:8000/users', { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}})
+          if (confirm("Do you want to end?")) {
+              $scope.end();
+          }
+          /*$http.get('http://127.0.0.1:8000/users', { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}})
             .success(function (data){
                 alert("Success");
             }).error(function (data, status){
                 alert("Error status : " + status);
-            });
+            });*/
       }
-
       $scope.end = function () {
           $scope.wayOfTime = 0;
+          alert("Ended");
       }
-      
   }
