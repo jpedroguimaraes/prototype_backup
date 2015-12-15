@@ -15,7 +15,7 @@
 		<h2>Found</h2>
 		<div class="listofdefects">
 			<ul>
-				<li ng-repeat="defect in defects" ng-class="{minorDefectListed: defect.type == 0, majorDefectListed: defect.type == 1}">
+				<li ng-repeat="defect in defects" ng-class="{unselectedDefectListed: defect.active == false, minorDefectListed: defect.type == 0, majorDefectListed: defect.type == 1}">
 					<table><tr><td ng-class="defectcell"><a href="" ng-click="jumpToDefect(defect.id)">{{defect.description}}</a></td><td ng-class="removecell"><a ng-click="toggleSelectionDefect(defect.id)" href="">X</a></td></tr></table>
 				</li>
 			</ul>

@@ -53,6 +53,10 @@ html, body {
     border: 2px solid red;
 }
 
+.unselectedDefectListed {
+    border: 2px solid gray;
+}
+
 .sidemenu h1 {
     text-align: center;
     text-shadow:
