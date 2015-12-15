@@ -74,6 +74,13 @@ var app = angular.module('prototype', ['ngRoute'])
           get: function() {
               return listofdefects;
           },
+          getByID: function(id) {
+              for (var i = 0; i < listofdefects.length; i++) {
+                if (listofdefects[i].id === id) { 
+                    return listofdefects[i];
+                }
+              }
+          },
           add: function(def) {
               listofdefects.push(def);
           },
@@ -81,6 +88,15 @@ var app = angular.module('prototype', ['ngRoute'])
               for (var i = 0; i < listofdefects.length; i++) {
                 if (listofdefects[i].id === id) { 
                     listofdefects.splice(i, 1);
+                    break;
+                }
+              }
+          },
+          toggleSelection: function(id) {
+              for (var i = 0; i < listofdefects.length; i++) {
+                if (listofdefects[i].id === id) { 
+                    var newstate = !(listofdefects[i].active);
+                    listofdefects[i].active = newstate;
                     break;
                 }
               }
@@ -97,7 +113,7 @@ var app = angular.module('prototype', ['ngRoute'])
       this.end = end;
       this.code = code;
       this.description = description;
-      this.active = false;
+      this.active = true;
       defectID++;
     }
     return Defect;
@@ -138,7 +154,7 @@ var app = angular.module('prototype', ['ngRoute'])
       };
   }  
 
-  function meetingCtrl ($scope, $interval, $routeParams, gameSetup, $location, cacheService) {
+  function meetingCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService) {
       try {
           if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
               $scope.user = cacheService.getData("user");
@@ -180,10 +196,26 @@ var app = angular.module('prototype', ['ngRoute'])
           $scope.time = $scope.time + $scope.wayOfTime;
           $scope.setClock();
           if ($scope.time == 0) {
-              //$scope.end();
+              $scope.end();
           }
       };
       $interval($scope.timer, 1000);
+      $scope.defects = defectList.get();
+      var newdefect = new Defect(0,10,20,"batatas",'lol');
+      defectList.add(newdefect);
+      $scope.toggleSelectionDefect = function (defectID) {
+          defectList.toggleSelection(defectID);
+          alert(defectList.getByID(defectID).active);
+      }
+      $scope.confirmEnd = function () {
+          if (confirm("Do you want to end?")) {
+              $scope.end();
+          }
+      }
+      $scope.end = function () {
+          $scope.wayOfTime = 0;
+          alert("Ended");
+      }
   }
 
   function resultCtrl ($scope, $routeParams, $location, cacheService) {
