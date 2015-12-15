@@ -205,12 +205,19 @@ var app = angular.module('prototype', ['ngRoute'])
       defectList.add(newdefect);
       $scope.toggleSelectionDefect = function (defectID) {
           defectList.toggleSelection(defectID);
-          alert(defectList.getByID(defectID).active);
       }
+      $scope.voteDefectUp = function (defectID) {
+          alert("Defect " + defectID + " voted up!");
+      }
+      $scope.voteDefectDown = function (defectID) {
+          alert("Defect " + defectID + " voted down!");
+      }
+      $scope.role = true;
       $scope.confirmEnd = function () {
-          if (confirm("Do you want to end?")) {
+          /*if (confirm("Do you want to end?")) {
               $scope.end();
-          }
+          }*/
+          $scope.role = !($scope.role);
       }
       $scope.end = function () {
           $scope.wayOfTime = 0;
