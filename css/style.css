@@ -89,18 +89,6 @@ tr {
     height: 100%;
 }
 
-.defectcell {
-    width: 90%;
-    vertical-align: center;
-}
-
-.removecell {
-    width: 10%;
-    height: 100%;
-    text-align: center;
-    vertical-align: center;
-}
-
 #selectedtype {
     text-align: center;
 }
@@ -311,4 +299,31 @@ tr {
 
 .listedgame a {
     color: black;
+}
+
+.votingbuttons {
+    padding: 0px;
+    margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px;
+}
+
+.votingbuttons td {
+    width: 50%;
+    padding: 0px;
+    margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px;
+    text-align: center;
+}
+
+.defectlisttable {
+    table-layout: fixed;
+}
+
+#defectdescriptioncell {
+    width: 80%;
+    word-wrap: break-word;
+    por aqui a cell a ficar com o background branco em mouse hover
+}
+
+#removedefectcell {
+    width: 20%;
+    text-align: center;
 }

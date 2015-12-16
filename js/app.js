@@ -239,9 +239,9 @@ var app = angular.module('prototype', ['ngRoute'])
   }
 
   function gameCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService) {
-      var w = $(window).width();
-      alert(w);
-      alert($('.container'));
+      //var w = $(window).width();
+      //alert(w);
+      //alert($('.container'));
       try {
           if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
               $scope.user = cacheService.getData("user");

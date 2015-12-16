@@ -16,7 +16,7 @@
 		<div class="listofdefects">
 			<ul>
 				<li ng-repeat="defect in defects" ng-class="{unselectedDefectListed: defect.active == false, minorDefectListed: defect.type == 0, majorDefectListed: defect.type == 1}">
-					<table><tr><td ng-class="defectcell"><a href="" ng-click="jumpToDefect(defect.id)">{{defect.description}}</a></td><td ng-class="removecell"><span ng-if="role"><a ng-click="toggleSelectionDefect(defect.id)" href=""><span ng-if="defect.active == false">Pick</span><span ng-if="defect.active == true">Unpick</span></a></span><span ng-if="role == false"><a ng-click="voteDefectUp(defect.id)" href="">+</a><a ng-click="voteDefectDown(defect.id)" href="">-</a></span></td></tr></table>
+					<table><tr><td ng-class="defectcell"><a href="" ng-click="jumpToDefect(defect.id)">{{defect.description}}</a></td><td ng-class="removecell"><span ng-if="role"><a ng-click="toggleSelectionDefect(defect.id)" href=""><span ng-if="defect.active == false">Pick</span><span ng-if="defect.active == true">Unpick</span></a></span><span ng-if="role == false"><table class="votingbuttons"><tr><td><a ng-click="voteDefectUp(defect.id)" href="">+</a></td><td><a ng-click="voteDefectDown(defect.id)" href="">-</a></td></tr></table></span></td></tr></table>
 				</li>
 			</ul>
 		</div>
