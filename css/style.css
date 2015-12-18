@@ -45,16 +45,16 @@ html, body {
     overflow-y: auto;
 }
 
+.unselectedDefectListed {
+    border: 2px solid gray;
+}
+
 .minorDefectListed {
     border: 2px solid #FFF000;
 }
 
 .majorDefectListed {
     border: 2px solid red;
-}
-
-.unselectedDefectListed {
-    border: 2px solid gray;
 }
 
 .sidemenu h1 {
@@ -320,10 +320,18 @@ tr {
 #defectdescriptioncell {
     width: 80%;
     word-wrap: break-word;
-    por aqui a cell a ficar com o background branco em mouse hover
 }
 
 #removedefectcell {
     width: 20%;
     text-align: center;
+}
+
+#defectcell {
+    width: 50%;
+    word-wrap: break-word;
+}
+
+#removecell {
+    width: 50%;
 }

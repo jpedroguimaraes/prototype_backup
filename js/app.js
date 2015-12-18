@@ -393,4 +393,10 @@ var app = angular.module('prototype', ['ngRoute'])
           $scope.wayOfTime = 0;
           alert("Ended");
       }
+      $scope.hoverRemoveButton = function () {
+          $("#removedefectcell").css("background-color", "white");
+      }
+      $scope.leaveRemoveButton = function () {
+          $("#removedefectcell").css("background-color", "#6495ed");
+      }
   }

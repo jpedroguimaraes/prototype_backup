@@ -33,7 +33,7 @@
 		<div class="listofdefects">
 			<ul>
 				<li ng-repeat="defect in defects" ng-class="{minorDefectListed: defect.type == 0, majorDefectListed: defect.type == 1}">
-					<table class="defectlisttable"><tr><td id="defectdescriptioncell"><a href="" ng-click="jumpToDefect(defect.id)">{{defect.description}}</a></td><td id="removedefectcell"><a ng-click="removeDefect(defect.id)" href="">X</a></td></tr></table>
+					<table class="defectlisttable"><tr><td id="defectdescriptioncell"><a href="" ng-click="jumpToDefect(defect.id)">{{defect.description}}</a></td><td id="removedefectcell"><a ng-mouseenter="hoverRemoveButton()" ng-mouseleave="leaveRemoveButton()" ng-click="removeDefect(defect.id)" href="">X</a></td></tr></table>
 				</li>
 			</ul>
 		</div>
