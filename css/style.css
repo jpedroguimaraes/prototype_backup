@@ -335,3 +335,14 @@ tr {
 #removecell {
     width: 50%;
 }
+
+.chat textarea {
+    width: 100%;
+    color: black;
+    background-color: white;
+}
+
+.chat input {
+    width: 100%;
+    color: black;
+}

@@ -26,6 +26,15 @@ var app = angular.module('prototype', ['ngRoute'])
       });
   });
 
+  app.directive('mark', function() {
+      return {
+          restrict: 'A',
+          replace: true,
+          transclude: true,
+          // template: '', // string template of the HTML above, or better yet
+      };
+  });
+
   app.factory('storageService', function ($rootScope) {
       return { 
           get: function (key) {
@@ -305,6 +314,8 @@ var app = angular.module('prototype', ['ngRoute'])
       $scope.selectType = function (type) {
           $scope.selectedType = type;
       }
+
+      // DUMP FUNCTION ===================
       $scope.dump = function (obj) {
           var out = '';
           for (var i in obj) {
@@ -316,6 +327,8 @@ var app = angular.module('prototype', ['ngRoute'])
           pre.innerHTML = out;
           document.body.appendChild(pre)
       }
+      // DUMP FUNCTION ===================
+
       $scope.pinpointDefect = function () {
           if ($scope.defectType == 0 || $scope.defectType == 1) {
               if($scope.selectedType != "" && $scope.selectedType != null) {
@@ -338,6 +351,8 @@ var app = angular.module('prototype', ['ngRoute'])
           defectList.remove(defectID);
           $('#' + defectID).attr("class", "");
       }
+
+      // PINPOINT DEFECT ==========================
       $scope.getSelectionPosition = function () {
           var range = window.getSelection().getRangeAt(0);
           var preSelectionRange = range.cloneRange();
@@ -375,6 +390,8 @@ var app = angular.module('prototype', ['ngRoute'])
               $(this).contents().unwrap();
           });
       }
+      // PINPOINT DEFECT ==========================
+
       $scope.jumpToDefect = function (defectID) {
           //TODO
       }
