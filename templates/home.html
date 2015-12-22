@@ -1,26 +1,29 @@
+<div class="listedgame">
+	<ul>
+		<li>{{user}} - <a ng-click="logout()" href="">Logout</a></li>
+	</ul>
+<div>
 <div class="gamelist">
-	<div class="listedgame">
-		<ul>
-			<li>{{user}} - <a ng-click="logout()" href="">Logout</a></li>
-		</ul>
-	<div>
 	<br>
 	<br>
 	<br>
 	<br>
 	<div class="listedgame">
-		<table>
+		<table border="2">
 			<tr>
-				<td>Game ID</td>
-				<td>Teacher</td>
+				<td>Game #1</td>
+				<td>Prof. X</td>
+				<td>Available</td>
 			</tr>
 			<tr>
-				<td><a ng-click="goToChallengeGame()" href="">Challenge</a></td>
-				<td><a ng-click="goToChallengeRanking()" href="">Ranking</a></td>
+				<td><a ng-click="goToChallengeGame(1)" href="">Challenge</a></td>
+				<td>30 minutes</td>
+				<td><a ng-click="goToChallengeRanking(1)" href="">Ranking</a></td>
 			</tr>
 			<tr>
-				<td><a ng-click="goToTeamGame()" href="">Team</a></td>
-				<td><a ng-click="goToTeamRanking()" href="">Ranking</a></td>
+				<td><a ng-click="goToTeamGame(1)" href="">Team</a></td>
+				<td>1 hour</td>
+				<td><a ng-click="goToTeamRanking(1)" href="">Ranking</a></td>
 			</tr>
 		</table>
 	</div>

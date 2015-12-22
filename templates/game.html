@@ -21,13 +21,13 @@
 		<h3 ng-if="selectedType != ''">Selected Type</h3>
 		<div id="selectedtype" ng-if="selectedType != ''">{{selectedType}}</div>
 	<div>
-		<h1>Title</b></h1>
-		<h3>Teacher</h3>
+		<h1>{{gameMode | capitalize}}</b></h1>
+		<h3>Game #{{gameID}}</h3>
 	</div>
 	<div>
 		<h2>Time - {{hours}}:{{minutes}}:{{seconds}}</h2>
 		<ul>
-			<li><a ng-click="confirmEnd()" class="btn btn-info btn-lg">Done</a></li>
+			<li><button ng-click="confirmEnd()" class="btn btn-info btn-lg">Done</button></li>
 		</ul>
 		<h2>Found</h2>
 		<div class="listofdefects">

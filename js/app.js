@@ -21,9 +21,19 @@ var app = angular.module('prototype', ['ngRoute'])
           controller: resultCtrl,
           templateUrl: 'templates/result.html'
       });
+      $routeProvider.when('/ranking/:id', {
+          controller: rankingCtrl,
+          templateUrl: 'templates/ranking.html'
+      });
       $routeProvider.otherwise({
           redirectTo : '/home'
       });
+  });
+
+  app.filter('capitalize', function() {
+      return function(input) {
+          return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
+      }
   });
 
   app.directive('mark', function() {
@@ -123,6 +133,8 @@ var app = angular.module('prototype', ['ngRoute'])
       this.code = code;
       this.description = description;
       this.active = true;
+      this.upVotes = 0;
+      this.downVotes = 0;
       defectID++;
     }
     return Defect;
@@ -138,11 +150,17 @@ var app = angular.module('prototype', ['ngRoute'])
       } catch (err) {
           $location.path("/login");
       }
-      $scope.goToChallengeGame = function() {
-          $location.path("/challenge/game/1");
+      $scope.goToChallengeGame = function(id) {
+          $location.path("/challenge/game/" + id);
       };
-      $scope.goToTeamGame = function() {
-          $location.path("/team/game/1");
+      $scope.goToTeamGame = function(id) {
+          $location.path("/team/game/" + id);
+      };
+      $scope.goToChallengeRanking = function(id) {
+          $location.path("/ranking/" + id);
+      };
+      $scope.goToTeamRanking = function(id) {
+          $location.path("/ranking/" + id);
       };
       $scope.logout = function() {
           cacheService.clearAll();
@@ -179,6 +197,8 @@ var app = angular.module('prototype', ['ngRoute'])
       $scope.gameID = $routeParams.id;
       $scope.gameMode = $routeParams.gamemode;
       $scope.gameDescription = gameSetup.load(2);
+      $scope.upVotedDefects = [];
+      $scope.downVotedDefects = [];
       $scope.wayOfTime = 0;
       if (true) { //check if countdown
           $scope.time = 900;
@@ -220,10 +240,10 @@ var app = angular.module('prototype', ['ngRoute'])
           defectList.toggleSelection(defectID);
       }
       $scope.voteDefectUp = function (defectID) {
-          alert("Defect " + defectID + " voted up!");
+          defectList.getByID(defectID).upVotes++; //add id to array of already upvoted. work like youtube ratings
       }
       $scope.voteDefectDown = function (defectID) {
-          alert("Defect " + defectID + " voted down!");
+          defectList.getByID(defectID).downVotes++;
       }
       $scope.role = true;
       $scope.confirmEnd = function () {
@@ -250,6 +270,32 @@ var app = angular.module('prototype', ['ngRoute'])
           $location.path("/login");
       }
       $scope.resultValue = "100";
+      $scope.goToRanking = function () {
+          $location.path("/ranking/" + $routeParams.id);
+      }
+      $scope.goToHome = function () {
+          $location.path("/home");
+      }
+  }
+
+  function rankingCtrl ($scope, $routeParams, $location, cacheService) {
+      try {
+          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
+              $scope.user = cacheService.getData("user");
+          } else {
+              $location.path("/login");
+          }
+      } catch (err) {
+          $location.path("/login");
+      }
+      $scope.gameID = $routeParams.id;
+      $scope.goToHome = function () {
+          $location.path("/home");
+      }
+      $scope.logout = function() {
+          cacheService.clearAll();
+          $location.path("/");
+      };
   }
 
   function gameCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService) {
@@ -261,6 +307,9 @@ var app = angular.module('prototype', ['ngRoute'])
           }
       } catch (err) {
           $location.path("/login");
+      }
+      if (!($routeParams.gamemode == "challenge" || $routeParams.gamemode == "team")) {
+          $location.path("/");
       }
       $scope.gameID = $routeParams.id;
       $scope.gameMode = $routeParams.gamemode;
@@ -411,7 +460,6 @@ var app = angular.module('prototype', ['ngRoute'])
       }
       $scope.end = function () {
           $scope.wayOfTime = 0;
-          alert("Ended");
           if($scope.gameMode == "challenge") {
               $location.path("/" + $scope.gameMode + "/result/" + $scope.gameID); //perhaps use the solution atempt id here
           } else if($scope.gameMode == "team") {

@@ -1,16 +1,16 @@
 <div class="sidemenu">
 	<div>
-		<h1>Title</b></h1>
-		<h3>Teacher</h3>
+		<h1>MEETING</b></h1>
+		<h3>Game #{{gameID}}</h3>
 	</div>
 	<div class="chat">
 		<textarea name="chatlog" disabled></textarea>
 		<input type="text" name="msgtosend">
 	</div>
-	<div>
+	<div class="sidemenuinfo">
 		<h2>Time - {{hours}}:{{minutes}}:{{seconds}}</h2>
 		<ul>
-			<li><a ng-click="confirmEnd()" class="btn btn-info btn-lg">Done</a></li>
+			<li><button ng-click="confirmEnd()" class="btn btn-info btn-lg">Done</button></li>
 		</ul>
 		<h2>Found</h2>
 		<div class="listofdefects">
@@ -30,15 +30,15 @@
 													<span ng-if="defect.active == false">Pick</span><span ng-if="defect.active == true">Unpick</span>
 												</a>
 											</td>
-											<td><a ng-click="voteDefectUp(defect.id)" href="">0 - 0</a></td>
+											<td><a href="">{{defect.upVotes}} - {{defect.downVotes}}</a></td>
 										</tr>
 									</table>
 								</span>
 								<span ng-if="role == false">
 									<table class="votingbuttons">
 										<tr>
-											<td><a ng-click="voteDefectUp(defect.id)" href="">+</a></td>
-											<td><a ng-click="voteDefectDown(defect.id)" href="">-</a></td>
+											<td><a ng-click="voteDefectUp(defect.id)" href="">{{defect.upVotes}}</a></td>
+											<td><a ng-click="voteDefectDown(defect.id)" href="">{{defect.downVotes}}</a></td>
 										</tr>
 									</table>
 								</span>
