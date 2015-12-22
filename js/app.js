@@ -235,7 +235,7 @@ var app = angular.module('prototype', ['ngRoute'])
       $scope.end = function () {
           $scope.wayOfTime = 0;
           alert("Ended");
-          $location.path("/" + $scope.gameMode + "/result/" + $scope.gameID);
+          $location.path("/" + $scope.gameMode + "/result/" + $scope.gameID); //perhaps use the solution atempt id here
       }
   }
 
@@ -415,7 +415,7 @@ var app = angular.module('prototype', ['ngRoute'])
           if($scope.gameMode == "challenge") {
               $location.path("/" + $scope.gameMode + "/result/" + $scope.gameID); //perhaps use the solution atempt id here
           } else if($scope.gameMode == "team") {
-              $location.path("/" + $scope.gameMode + "/meeting/" + $scope.gameID);
+              $location.path("/" + $scope.gameMode + "/meeting/" + $scope.gameID); //perhaps use the solution atempt id here
           }
       }
       $scope.hoverRemoveButton = function () {

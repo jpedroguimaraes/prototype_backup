@@ -9,10 +9,19 @@
 	<br>
 	<br>
 	<div class="listedgame">
-		Game
-		<ul>
-			<li><a ng-click="goToChallengeGame()" href="">Challenge</a></li>
-			<li><a ng-click="goToTeamGame()" href="">Team</a></li>
-		</ul>
+		<table>
+			<tr>
+				<td>Game ID</td>
+				<td>Teacher</td>
+			</tr>
+			<tr>
+				<td><a ng-click="goToChallengeGame()" href="">Challenge</a></td>
+				<td><a ng-click="goToChallengeRanking()" href="">Ranking</a></td>
+			</tr>
+			<tr>
+				<td><a ng-click="goToTeamGame()" href="">Team</a></td>
+				<td><a ng-click="goToTeamRanking()" href="">Ranking</a></td>
+			</tr>
+		</table>
 	</div>
 </div>
