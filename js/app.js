@@ -448,14 +448,28 @@ var app = angular.module('prototype', ['ngRoute'])
           //TODO
       }
       $scope.confirmEnd = function () {
-          if (confirm("Do you want to end?")) {
+          /*if (confirm("Do you want to end?")) {
               $scope.end();
+          }*/
+          var req = {
+           method: 'GET',
+           url: 'http://prototype-jpguimaraes.rhcloud.com/users',
+           headers: {
+             'Content-Type': 'application/json'
+           },
+           data: { test: 'test' }
           }
-          /*$http.get('http://127.0.0.1:8000/users', { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}})
+          $http(req).then(function() 
+            {
+              alert("Success: ");
+            }, function(){
+              alert("Error status");
+            });
+          /*$http.get('http://prototype-jpguimaraes.rhcloud.com/users', { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}})
             .success(function (data){
-                alert("Success");
+                alert("Success: " + data);
             }).error(function (data, status){
-                alert("Error status : " + status);
+                alert("Error status : " + status + " : " + data);
             });*/
       }
       $scope.end = function () {
