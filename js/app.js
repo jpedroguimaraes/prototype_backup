@@ -9,15 +9,15 @@ var app = angular.module('prototype', ['ngRoute'])
           controller: loginCtrl,
           templateUrl: 'templates/login.html'
       });
-      $routeProvider.when('/game/:id', {
+      $routeProvider.when('/:gamemode/game/:id', {
           controller: gameCtrl,
           templateUrl: 'templates/game.html'
       });
-      $routeProvider.when('/meeting/:id', {
+      $routeProvider.when('/:gamemode/meeting/:id', {
           controller: meetingCtrl,
           templateUrl: 'templates/meeting.html'
       });
-      $routeProvider.when('/result/:id', {
+      $routeProvider.when('/:gamemode/result/:id', {
           controller: resultCtrl,
           templateUrl: 'templates/result.html'
       });
@@ -138,8 +138,11 @@ var app = angular.module('prototype', ['ngRoute'])
       } catch (err) {
           $location.path("/login");
       }
-      $scope.goToGame = function() {
-          $location.path("/game/1");
+      $scope.goToChallengeGame = function() {
+          $location.path("/challenge/game/1");
+      };
+      $scope.goToTeamGame = function() {
+          $location.path("/team/game/1");
       };
       $scope.logout = function() {
           cacheService.clearAll();
@@ -174,6 +177,7 @@ var app = angular.module('prototype', ['ngRoute'])
           $location.path("/login");
       }
       $scope.gameID = $routeParams.id;
+      $scope.gameMode = $routeParams.gamemode;
       $scope.gameDescription = gameSetup.load(2);
       $scope.wayOfTime = 0;
       if (true) { //check if countdown
@@ -231,6 +235,7 @@ var app = angular.module('prototype', ['ngRoute'])
       $scope.end = function () {
           $scope.wayOfTime = 0;
           alert("Ended");
+          $location.path("/" + $scope.gameMode + "/result/" + $scope.gameID);
       }
   }
 
@@ -248,9 +253,6 @@ var app = angular.module('prototype', ['ngRoute'])
   }
 
   function gameCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService) {
-      //var w = $(window).width();
-      //alert(w);
-      //alert($('.container'));
       try {
           if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
               $scope.user = cacheService.getData("user");
@@ -261,6 +263,7 @@ var app = angular.module('prototype', ['ngRoute'])
           $location.path("/login");
       }
       $scope.gameID = $routeParams.id;
+      $scope.gameMode = $routeParams.gamemode;
       $scope.gameDescription = gameSetup.load(2);
       $scope.wayOfTime = 0;
       if (true) { //check if countdown
@@ -409,6 +412,11 @@ var app = angular.module('prototype', ['ngRoute'])
       $scope.end = function () {
           $scope.wayOfTime = 0;
           alert("Ended");
+          if($scope.gameMode == "challenge") {
+              $location.path("/" + $scope.gameMode + "/result/" + $scope.gameID); //perhaps use the solution atempt id here
+          } else if($scope.gameMode == "team") {
+              $location.path("/" + $scope.gameMode + "/meeting/" + $scope.gameID);
+          }
       }
       $scope.hoverRemoveButton = function () {
           $("#removedefectcell").css("background-color", "white");
