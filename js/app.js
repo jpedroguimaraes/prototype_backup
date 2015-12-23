@@ -1,6 +1,6 @@
 var app = angular.module('prototype', ['ngRoute'])
 
-  app.config(function ($routeProvider) {
+  app.config(function ($routeProvider, $httpProvider) {
       $routeProvider.when('/home', {
           controller: homeCtrl,
           templateUrl: 'templates/home.html'
@@ -28,6 +28,8 @@ var app = angular.module('prototype', ['ngRoute'])
       $routeProvider.otherwise({
           redirectTo : '/home'
       });
+      $httpProvider.defaults.useXDomain = true;
+      delete $httpProvider.defaults.headers.common["X-Requested-With"];
   });
 
   app.filter('capitalize', function() {
@@ -451,12 +453,9 @@ var app = angular.module('prototype', ['ngRoute'])
           /*if (confirm("Do you want to end?")) {
               $scope.end();
           }*/
-          var req = {
+          /*var req = {
            method: 'GET',
-           url: 'http://prototype-jpguimaraes.rhcloud.com/users',
-           headers: {
-             'Content-Type': 'application/json'
-           },
+           url: 'http://127.0.0.1:8080/users',
            data: { test: 'test' }
           }
           $http(req).then(function() 
@@ -464,13 +463,13 @@ var app = angular.module('prototype', ['ngRoute'])
               alert("Success: ");
             }, function(){
               alert("Error status");
-            });
-          /*$http.get('http://prototype-jpguimaraes.rhcloud.com/users', { headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}})
+            });*/
+          $http.get('http://prototype-jpguimaraes.rhcloud.com/users')
             .success(function (data){
                 alert("Success: " + data);
             }).error(function (data, status){
                 alert("Error status : " + status + " : " + data);
-            });*/
+            });
       }
       $scope.end = function () {
           $scope.wayOfTime = 0;
