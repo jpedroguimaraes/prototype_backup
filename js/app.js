@@ -38,13 +38,26 @@ var app = angular.module('prototype', ['ngRoute'])
       }
   });
 
-  app.directive('mark', function() {
-      return {
-          restrict: 'A',
-          replace: true,
-          transclude: true,
-          // template: '', // string template of the HTML above, or better yet
-      };
+  app.directive('smartchar', function () {
+    return {
+        scope: true,
+        link: function (scope, element) {
+            scope.id = parseInt(element.attr('id').split('a')[1]);
+            scope.$on('text-was-selected', function(event, params){
+                var begin = parseInt(params['begin'].split('a')[1]);
+                var end = parseInt(params['end'].split('a')[1]);
+                if(end>begin) {
+                    if (scope.id >= begin && scope.id <= end) {
+                        element.css('color', 'red');
+                    }
+                }else{
+                    if (scope.id <= begin && scope.id >= end) {
+                        element.css('color', 'red');
+                    }
+                }
+            });
+        }
+    }
   });
 
   app.factory('storageService', function ($rootScope) {
@@ -145,7 +158,7 @@ var app = angular.module('prototype', ['ngRoute'])
     return Defect;
   });
 
-  function homeCtrl ($scope, $location, cacheService) {
+  function homeCtrl ($scope, $location, cacheService, $http) {
       try {
           if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
               $scope.user = cacheService.getData("user");
@@ -155,6 +168,19 @@ var app = angular.module('prototype', ['ngRoute'])
       } catch (err) {
           $location.path("/login");
       }
+      $scope.testConnection = function() {
+          var req = {
+           method: 'GET',
+           url: 'http://revision-jpguimaraes.rhcloud.com/',
+           data: { test: 'teste'}
+          }
+          $http(req).then(function(res) 
+            {
+              alert("Connected");
+            }, function(){
+              alert("Error");
+            });
+      };
       $scope.goToChallengeGame = function(id) {
           $location.path("/challenge/game/" + id);
       };
@@ -453,45 +479,9 @@ var app = angular.module('prototype', ['ngRoute'])
           //TODO
       }
       $scope.confirmEnd = function () {
-          /*if (confirm("Do you want to end?")) {
+          if (confirm("Do you want to end?")) {
               $scope.end();
-          }*/
-          /*var req = {
-           method: 'POST',
-           url: 'http://prototype-jpguimaraes.rhcloud.com/users',
-           data: { test: 'test' }
           }
-          $http(req).then(function(res) 
-            {
-              alert("Success: " + res.data);
-            }, function(){
-              alert("Error status");
-            });*/
-          var req = {
-           method: 'GET',
-           url: 'http://revision-jpguimaraes.rhcloud.com/',
-           data: { test: 'teste'}
-          }
-          $http(req).then(function(res) 
-            {
-              alert("Blargh " + res.data);
-            }, function(){
-              alert("Error status");
-            });
-          /*$http.get('http://prototype-jpguimaraes.rhcloud.com/users')
-            .success(function (data){
-                alert("Success: " + data);
-            }).error(function (data, status){
-                alert("Error status : " + status + " : " + data);
-            });*/
-          /*var invocation = new XMLHttpRequest();
-          invocation.open('GET', 'http://127.0.0.1:8080/users', true);
-          invocation.setRequestHeader('X-PINGOTHER', 'pingpong');
-          invocation.setRequestHeader('Content-Type', 'application/json');
-          invocation.onreadystatechange = function () {
-            alert("dá?");
-          };
-          invocation.send();*/
 
       }
       $scope.end = function () {
@@ -508,4 +498,21 @@ var app = angular.module('prototype', ['ngRoute'])
       $scope.leaveRemoveButton = function () {
           $("#removedefectcell").css("background-color", "#6495ed");
       }
+
+      /*$(document).on('selectionchange', function (e) {
+            $scope.$broadcast('text-was-selected', $scope.getSelectionTextWrapper());
+        });
+      $scope.getSelectionTextWrapper = function () {
+          var wrapperElements = null, selection;
+          if (window.getSelection) {
+              selection = window.getSelection();
+              if (selection.rangeCount) {
+                  wrapperElements = {begin:selection.anchorNode.parentNode.id, end: selection.focusNode.parentNode.id};
+              }
+          } else if (document.selection && document.selection.type != "Control") {
+              //Tratar deste caso
+              wrapperElements = document.selection.createRange().parentElement();
+          }
+          return wrapperElements;
+      };*/
   }
