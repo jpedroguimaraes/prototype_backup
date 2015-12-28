@@ -121,6 +121,9 @@ var app = angular.module('prototype', ['ngRoute'])
                     break;
                 }
               }
+          },
+          clear: function() {
+              listofdefects.clear();
           }
       }
   });   
@@ -454,30 +457,41 @@ var app = angular.module('prototype', ['ngRoute'])
               $scope.end();
           }*/
           /*var req = {
-           method: 'GET',
-           url: 'http://127.0.0.1:8080/users',
+           method: 'POST',
+           url: 'http://prototype-jpguimaraes.rhcloud.com/users',
            data: { test: 'test' }
           }
-          $http(req).then(function() 
+          $http(req).then(function(res) 
             {
-              alert("Success: ");
+              alert("Success: " + res.data);
             }, function(){
               alert("Error status");
             });*/
+          var req = {
+           method: 'GET',
+           url: 'http://revision-jpguimaraes.rhcloud.com/',
+           data: { test: 'teste'}
+          }
+          $http(req).then(function(res) 
+            {
+              alert("Blargh " + res.data);
+            }, function(){
+              alert("Error status");
+            });
           /*$http.get('http://prototype-jpguimaraes.rhcloud.com/users')
             .success(function (data){
                 alert("Success: " + data);
             }).error(function (data, status){
                 alert("Error status : " + status + " : " + data);
             });*/
-          var invocation = new XMLHttpRequest();
+          /*var invocation = new XMLHttpRequest();
           invocation.open('GET', 'http://127.0.0.1:8080/users', true);
           invocation.setRequestHeader('X-PINGOTHER', 'pingpong');
           invocation.setRequestHeader('Content-Type', 'application/json');
           invocation.onreadystatechange = function () {
             alert("dá?");
           };
-          invocation.send();
+          invocation.send();*/
 
       }
       $scope.end = function () {
