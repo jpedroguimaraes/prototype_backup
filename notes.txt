@@ -53,3 +53,51 @@ gamesApp.directive('smartchar', function () {
     <smartchar id="a10">C</smartchar>
     <smartchar id="a11">T</smartchar>
 </div>
+
+
+
+
+
+
+
+
+
+// PINPOINT DEFECT ==========================
+      $scope.getSelectionPosition = function () {
+          var range = window.getSelection().getRangeAt(0);
+          var preSelectionRange = range.cloneRange();
+          preSelectionRange.selectNodeContents(document.getElementById("code"));
+          preSelectionRange.setEnd(range.startContainer, range.startOffset);
+          var start = preSelectionRange.toString().length;
+          return {
+              start: start,
+              end: start + range.toString().length,
+              text: range.toString()
+          }
+      }
+      $scope.markText = function(markInfo, defectID) {
+          var selection = window.getSelection().getRangeAt(0);
+          var selectedText = selection.extractContents();
+          if (markInfo.text != "" && markInfo.text != null && markInfo.text != undefined) {
+              var span = document.createElement("span");
+              span.className = "mark";
+              span.setAttribute("id", defectID);
+              span.setAttribute("PosStart", markInfo.start);
+              span.setAttribute("PosEnd", markInfo.end);
+              span.appendChild(selectedText);
+              selection.insertNode(span);
+              $('#' + defectID).attr("class", "mark");
+              return markInfo.text;
+          } else {
+              return null;
+          }
+      };
+      $scope.removeMarks = function() {
+          $('.mark').each(function () {
+              $(this).contents().unwrap();
+          });
+          $('.currentmark').each(function () {
+              $(this).contents().unwrap();
+          });
+      }
+      // PINPOINT DEFECT ==========================

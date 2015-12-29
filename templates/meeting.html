@@ -37,8 +37,8 @@
 								<span ng-if="role == false">
 									<table class="votingbuttons">
 										<tr>
-											<td><a ng-click="voteDefectUp(defect.id)" href="">{{defect.upVotes}}</a></td>
-											<td><a ng-click="voteDefectDown(defect.id)" href="">{{defect.downVotes}}</a></td>
+											<td ng-class="upVoted(defect.id) ? 'upvoted' : ''"><a ng-click="voteDefectUp(defect.id)" href="">{{defect.upVotes}}</a></td>
+											<td ng-class="downVoted(defect.id) ? 'downvoted' : ''"><a ng-click="voteDefectDown(defect.id)" href="">{{defect.downVotes}}</a></td>
 										</tr>
 									</table>
 								</span>

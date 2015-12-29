@@ -28,8 +28,8 @@ var app = angular.module('prototype', ['ngRoute'])
       $routeProvider.otherwise({
           redirectTo : '/home'
       });
-      $httpProvider.defaults.useXDomain = true;
-      delete $httpProvider.defaults.headers.common["X-Requested-With"];
+      //$httpProvider.defaults.useXDomain = true;
+      //delete $httpProvider.defaults.headers.common["X-Requested-With"];
   });
 
   app.filter('capitalize', function() {
@@ -40,25 +40,27 @@ var app = angular.module('prototype', ['ngRoute'])
 
   app.directive('smartchar', function () {
     return {
-        scope: true,
-        link: function (scope, element) {
-            scope.id = parseInt(element.attr('id').split('a')[1]);
-            scope.$on('text-was-selected', function(event, params){
-                var begin = parseInt(params['begin'].split('a')[1]);
-                var end = parseInt(params['end'].split('a')[1]);
-                if(end>begin) {
-                    if (scope.id >= begin && scope.id <= end) {
-                        element.css('color', 'red');
-                    }
-                }else{
-                    if (scope.id <= begin && scope.id >= end) {
-                        element.css('color', 'red');
-                    }
-                }
-            });
-        }
-    }
+          scope: true,
+          controller: ['$scope', '$element', function ($scope, $element) {
+              $scope.id = parseInt($element.attr('id').split('a')[1]);
+              $scope.$on('text-was-selected', function(event, params){
+                  var begin = parseInt(params['begin'].split('a')[1]);
+                  var end = parseInt(params['end'].split('a')[1]);
+                  console.log("marked");
+                  if(end>begin) {
+                      if ($scope.id >= begin && $scope.id <= end) {
+                          $element.css('background-color', 'blue');
+                      }
+                  }else{
+                      if ($scope.id <= begin && $scope.id >= end) {
+                          $element.css('background-color', 'blue');
+                      }
+                  }
+              });
+          }]
+      }
   });
+
 
   app.factory('storageService', function ($rootScope) {
       return { 
@@ -270,11 +272,31 @@ var app = angular.module('prototype', ['ngRoute'])
       $scope.toggleSelectionDefect = function (defectID) {
           defectList.toggleSelection(defectID);
       }
+      $scope.upVoted = function (defectID) {
+          return ($scope.upVotedDefects.indexOf(defectID) >= 0);
+      }
+      $scope.downVoted = function (defectID) {
+          return ($scope.downVotedDefects.indexOf(defectID) >= 0);
+      }
       $scope.voteDefectUp = function (defectID) {
-          defectList.getByID(defectID).upVotes++; //add id to array of already upvoted. work like youtube ratings
+          if($scope.upVotedDefects.indexOf(defectID) < 0) {
+              defectList.getByID(defectID).upVotes++;
+              $scope.upVotedDefects.push(defectID);
+              if($scope.downVotedDefects.indexOf(defectID) >= 0) {
+                  defectList.getByID(defectID).downVotes--;
+                  $scope.downVotedDefects.splice($scope.downVotedDefects.indexOf(defectID),1);
+              }
+          }
       }
       $scope.voteDefectDown = function (defectID) {
-          defectList.getByID(defectID).downVotes++;
+          if($scope.downVotedDefects.indexOf(defectID) < 0) {
+              defectList.getByID(defectID).downVotes++;
+              $scope.downVotedDefects.push(defectID);
+              if($scope.upVotedDefects.indexOf(defectID) >= 0) {
+                  defectList.getByID(defectID).upVotes--;
+                  $scope.upVotedDefects.splice($scope.upVotedDefects.indexOf(defectID),1);
+              }
+          }
       }
       $scope.role = true;
       $scope.confirmEnd = function () {
@@ -418,7 +440,8 @@ var app = angular.module('prototype', ['ngRoute'])
                   var selectedText = $scope.getSelectionPosition();
                   if (selectedText.text != "" && selectedText.text != null && selectedText.text != undefined) {
                       var newdefect = new Defect($scope.defectType,selectedText.start,selectedText.end,selectedText.text,$scope.selectedType);
-                      $scope.markText(selectedText, newdefect.id);
+                      //$scope.markText(selectedText, newdefect.id);
+                      $scope.$broadcast('text-was-selected', $scope.getSelectionTextWrapper());
                       defectList.add(newdefect);
                   } else {
                       alert('No selection');
@@ -432,10 +455,9 @@ var app = angular.module('prototype', ['ngRoute'])
       }
       $scope.removeDefect = function (defectID) {
           defectList.remove(defectID);
-          $('#' + defectID).attr("class", "");
+          //clear marks
       }
 
-      // PINPOINT DEFECT ==========================
       $scope.getSelectionPosition = function () {
           var range = window.getSelection().getRangeAt(0);
           var preSelectionRange = range.cloneRange();
@@ -448,32 +470,26 @@ var app = angular.module('prototype', ['ngRoute'])
               text: range.toString()
           }
       }
-      $scope.markText = function(markInfo, defectID) {
-          var selection = window.getSelection().getRangeAt(0);
-          var selectedText = selection.extractContents();
-          if (markInfo.text != "" && markInfo.text != null && markInfo.text != undefined) {
-              var span = document.createElement("span");
-              span.className = "mark";
-              span.setAttribute("id", defectID);
-              span.setAttribute("PosStart", markInfo.start);
-              span.setAttribute("PosEnd", markInfo.end);
-              span.appendChild(selectedText);
-              selection.insertNode(span);
-              $('#' + defectID).attr("class", "mark");
-              return markInfo.text;
-          } else {
-              return null;
+
+
+
+      $scope.getSelectionTextWrapper = function () {
+          var wrapperElements = null, selection;
+          if (window.getSelection) {
+              selection = window.getSelection();
+              if (selection.rangeCount) {
+                  wrapperElements = {begin:selection.anchorNode.parentNode.id, end: selection.focusNode.parentNode.id};
+              }
+          } else if (document.selection && document.selection.type != "Control") {
+              //Tratar deste caso
+              wrapperElements = document.selection.createRange().parentElement();
           }
+          return wrapperElements;
       };
-      $scope.removeMarks = function() {
-          $('.mark').each(function () {
-              $(this).contents().unwrap();
-          });
-          $('.currentmark').each(function () {
-              $(this).contents().unwrap();
-          });
-      }
-      // PINPOINT DEFECT ==========================
+
+
+
+
 
       $scope.jumpToDefect = function (defectID) {
           //TODO

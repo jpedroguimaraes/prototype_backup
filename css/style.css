@@ -360,3 +360,23 @@ tr {
     width: 100%;
     color: black;
 }
+
+.upvoted {
+    background-color: green;
+}
+
+.downvoted {
+    background-color: red;
+}
+
+.appname {
+    color: white;
+    text-align: center;
+    text-shadow:
+    -2px -2px 0 blue,
+    2px -2px 0 blue,
+    -2px 2px 0 blue,
+    2px 2px 0 blue;
+    font-weight: bold;
+    font-size: 100px;
+}

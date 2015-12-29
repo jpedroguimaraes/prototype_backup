@@ -4,19 +4,18 @@ gamesApp.directive('smartchar', function () {
     return {
         scope: true,
         controller: ['$scope', '$element', function ($scope, $element) {
-            console.log("ola");
             $scope.id = parseInt($element.attr('id').split('a')[1]);
             $scope.$on('text-was-selected', function(event, params){
-            console.log("ola2");
                 var begin = parseInt(params['begin'].split('a')[1]);
                 var end = parseInt(params['end'].split('a')[1]);
+                console.log("marked");
                 if(end>begin) {
                     if ($scope.id >= begin && $scope.id <= end) {
-                        $element.css('color', 'red');
+                        $element.css('background-color', 'blue');
                     }
                 }else{
                     if ($scope.id <= begin && $scope.id >= end) {
-                        $element.css('color', 'red');
+                        $element.css('background-color', 'blue');
                     }
                 }
             });
@@ -25,10 +24,6 @@ gamesApp.directive('smartchar', function () {
 });
 
 gamesApp.controller('selectorCtrl', ['$scope', function($scope){
-        $(document).on('selectionchange', function (e) {
-            console.log("ola0");
-            $scope.$broadcast('text-was-selected', $scope.getSelectionTextWrapper());
-        });
         $scope.getSelectionTextWrapper = function () {
             var wrapperElements = null, selection;
             if (window.getSelection) {
@@ -41,5 +36,8 @@ gamesApp.controller('selectorCtrl', ['$scope', function($scope){
                 wrapperElements = document.selection.createRange().parentElement();
             }
             return wrapperElements;
+        };
+        $scope.mark = function () {
+            $scope.$broadcast('text-was-selected', $scope.getSelectionTextWrapper());
         };
 }]);
