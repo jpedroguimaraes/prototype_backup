@@ -364,6 +364,12 @@ var app = angular.module('prototype', ['ngRoute'])
       if (!($routeParams.gamemode == "challenge" || $routeParams.gamemode == "team")) {
           $location.path("/");
       }
+
+alert($('#code').text()[$('#code').text().length-1]);
+alert($('#code').text().length); 
+//percorrer array
+
+
       $scope.gameID = $routeParams.id;
       $scope.gameMode = $routeParams.gamemode;
       $scope.gameDescription = gameSetup.load(2);
