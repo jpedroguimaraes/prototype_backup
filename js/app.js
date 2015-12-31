@@ -42,18 +42,21 @@ var app = angular.module('prototype', ['ngRoute'])
     return {
           scope: true,
           controller: ['$scope', '$element', function ($scope, $element) {
-              $scope.id = parseInt($element.attr('id').split('a')[1]);
-              $scope.$on('text-was-selected', function(event, params){
+              $scope.$on('text-was-selected', function(event, params){ //put target color in params
                   var begin = parseInt(params['begin'].split('a')[1]);
                   var end = parseInt(params['end'].split('a')[1]);
-                  console.log("marked");
-                  if(end>begin) {
-                      if ($scope.id >= begin && $scope.id <= end) {
-                          $element.css('background-color', 'blue');
+                  var color = params['color'];
+                  console.log("changed: " + begin + " to " + end);
+                  if(end > begin) {
+                      for (i = begin; i <= end; i++) {
+                          document.querySelector("#a"+i).style.backgroundColor = color;
                       }
-                  }else{
-                      if ($scope.id <= begin && $scope.id >= end) {
-                          $element.css('background-color', 'blue');
+                  } else {
+                      var temp = begin;
+                      begin = end;
+                      end = temp;
+                      for (i = begin; i <= end; i++) {
+                          document.querySelector("#a"+i).style.backgroundColor = color;
                       }
                   }
               });
@@ -145,10 +148,10 @@ var app = angular.module('prototype', ['ngRoute'])
 
   app.factory('Defect', function () {
     var defectID = 0;
-    function Defect(type, start, end, code, description) {
+    function Defect(type, begin, end, code, description) {
       this.id = 'd' + defectID;
       this.type = type;
-      this.start = start;
+      this.begin = begin;
       this.end = end;
       this.code = code;
       this.description = description;
@@ -365,10 +368,13 @@ var app = angular.module('prototype', ['ngRoute'])
           $location.path("/");
       }
 
-alert($('#code').text()[$('#code').text().length-1]);
-alert($('#code').text().length); 
-//percorrer array
-
+      var codetext = $('#code').text();
+      var newcodetext = "";
+      for (i = 1; i <= codetext.length; i++) {
+          var tempchar = '<smartchar id="a' + i + '">' + codetext[i-1] + '</smartchar>';
+          newcodetext += tempchar;
+      }
+      document.getElementById("code").innerHTML = newcodetext;
 
       $scope.gameID = $routeParams.id;
       $scope.gameMode = $routeParams.gamemode;
@@ -445,10 +451,13 @@ alert($('#code').text().length);
               if($scope.selectedType != "" && $scope.selectedType != null) {
                   var selectedText = $scope.getSelectionPosition();
                   if (selectedText.text != "" && selectedText.text != null && selectedText.text != undefined) {
-                      var newdefect = new Defect($scope.defectType,selectedText.start,selectedText.end,selectedText.text,$scope.selectedType);
-                      //$scope.markText(selectedText, newdefect.id);
-                      $scope.$broadcast('text-was-selected', $scope.getSelectionTextWrapper());
-                      defectList.add(newdefect);
+                      var stw = $scope.getSelectionTextWrapper();
+                      if(stw != undefined && stw != null) {
+                          var newdefect = new Defect($scope.defectType,stw.begin,stw.end,selectedText.text,$scope.selectedType);
+                          //$scope.markText(selectedText, newdefect.id);
+                          $scope.$broadcast('text-was-selected', stw);
+                          defectList.add(newdefect);
+                      }
                   } else {
                       alert('No selection');
                   }
@@ -460,10 +469,10 @@ alert($('#code').text().length);
           }
       }
       $scope.removeDefect = function (defectID) {
+          $scope.$broadcast('text-was-selected', {begin: defectList.getByID(defectID).begin, end: defectList.getByID(defectID).end, color: ''});
           defectList.remove(defectID);
-          //clear marks
+          $scope.markDefects();
       }
-
       $scope.getSelectionPosition = function () {
           var range = window.getSelection().getRangeAt(0);
           var preSelectionRange = range.cloneRange();
@@ -476,35 +485,38 @@ alert($('#code').text().length);
               text: range.toString()
           }
       }
-
-
-
       $scope.getSelectionTextWrapper = function () {
           var wrapperElements = null, selection;
           if (window.getSelection) {
               selection = window.getSelection();
               if (selection.rangeCount) {
-                  wrapperElements = {begin:selection.anchorNode.parentNode.id, end: selection.focusNode.parentNode.id};
+                  wrapperElements = {begin:selection.anchorNode.parentNode.id, end: selection.focusNode.parentNode.id, color: 'rgba(0, 255, 255, 0.3)'};
               }
           } else if (document.selection && document.selection.type != "Control") {
               //Tratar deste caso
               wrapperElements = document.selection.createRange().parentElement();
           }
           return wrapperElements;
-      };
-
-
-
-
-
+      }
+      $scope.clearDefects = function () {
+          for (i = 0; i < defectList.get().length; i++) {
+              $scope.$broadcast('text-was-selected', {begin: defectList.get()[i].begin, end: defectList.get()[i].end, color: ''});
+          }
+      }
+      $scope.markDefects = function () {
+          for (i = 0; i < defectList.get().length; i++) {
+              $scope.$broadcast('text-was-selected', {begin: defectList.get()[i].begin, end: defectList.get()[i].end, color: 'rgba(0, 255, 255, 0.3)'});
+          }
+      }
       $scope.jumpToDefect = function (defectID) {
-          //TODO
+          $scope.markDefects();
+          $scope.$broadcast('text-was-selected', {begin: defectList.getByID(defectID).begin, end: defectList.getByID(defectID).end, color: 'orange'});
+          //TODO: jump
       }
       $scope.confirmEnd = function () {
           if (confirm("Do you want to end?")) {
               $scope.end();
           }
-
       }
       $scope.end = function () {
           $scope.wayOfTime = 0;
@@ -514,27 +526,10 @@ alert($('#code').text().length);
               $location.path("/" + $scope.gameMode + "/meeting/" + $scope.gameID); //perhaps use the solution atempt id here
           }
       }
-      $scope.hoverRemoveButton = function () {
-          $("#removedefectcell").css("background-color", "white");
+      $scope.hoverRemoveButton = function (defectID) {
+          $("#"+defectID).find("#removedefectcell").css("background-color", "white");
       }
-      $scope.leaveRemoveButton = function () {
-          $("#removedefectcell").css("background-color", "#6495ed");
+      $scope.leaveRemoveButton = function (defectID) {
+          $("#"+defectID).find("#removedefectcell").css("background-color", "#6495ed");
       }
-
-      /*$(document).on('selectionchange', function (e) {
-            $scope.$broadcast('text-was-selected', $scope.getSelectionTextWrapper());
-        });
-      $scope.getSelectionTextWrapper = function () {
-          var wrapperElements = null, selection;
-          if (window.getSelection) {
-              selection = window.getSelection();
-              if (selection.rangeCount) {
-                  wrapperElements = {begin:selection.anchorNode.parentNode.id, end: selection.focusNode.parentNode.id};
-              }
-          } else if (document.selection && document.selection.type != "Control") {
-              //Tratar deste caso
-              wrapperElements = document.selection.createRange().parentElement();
-          }
-          return wrapperElements;
-      };*/
   }
