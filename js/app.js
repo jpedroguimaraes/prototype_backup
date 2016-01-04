@@ -38,29 +38,27 @@ var app = angular.module('prototype', ['ngRoute'])
       }
   });
 
-  app.directive('smartchar', function () {
-    return {
-          scope: true,
-          controller: ['$scope', '$element', function ($scope, $element) {
-              $scope.$on('text-was-selected', function(event, params){ //put target color in params
-                  var begin = parseInt(params['begin'].split('a')[1]);
-                  var end = parseInt(params['end'].split('a')[1]);
-                  var color = params['color'];
-                  console.log("changed: " + begin + " to " + end);
-                  if(end > begin) {
-                      for (i = begin; i <= end; i++) {
-                          document.querySelector("#a"+i).style.backgroundColor = color;
-                      }
-                  } else {
-                      var temp = begin;
-                      begin = end;
-                      end = temp;
-                      for (i = begin; i <= end; i++) {
-                          document.querySelector("#a"+i).style.backgroundColor = color;
-                      }
+  app.factory('marking', function () {
+      return {
+          mark: function(params) { //put target color in params
+              console.log("directive");
+              var begin = parseInt(params['begin'].split('a')[1]);
+              var end = parseInt(params['end'].split('a')[1]);
+              var color = params['color'];
+              console.log("changed: " + begin + " to " + end + " : " + color);
+              if(end > begin) {
+                  for (i = begin; i <= end; i++) {
+                      document.querySelector("#a"+i).style.backgroundColor = color;
                   }
-              });
-          }]
+              } else {
+                  var temp = begin;
+                  begin = end;
+                  end = temp;
+                  for (i = begin; i <= end; i++) {
+                      document.querySelector("#a"+i).style.backgroundColor = color;
+                  }
+              }
+          }
       }
   });
 
@@ -211,12 +209,23 @@ var app = angular.module('prototype', ['ngRoute'])
           }
       } catch (err) { }
       $scope.login = function() {
-          if($scope.username == "teste" && $scope.username == "teste") {
+          var req = {
+           method: 'POST',
+           url: 'http://revision-jpguimaraes.rhcloud.com/login',
+           data: { username: $scope.username, pw: $scope.password}
+          }
+          $http(req).then(function(res) 
+            {
+              alert("Connected" + res);
+            }, function(){
+              alert("Error");
+            });
+          /*if($scope.username == "teste" && $scope.password == "teste") {
               cacheService.setData("user", "1");
               $location.path("/");
           } else {
               alert("Login errado!");
-          }
+          }*/
       };
   }  
 
@@ -236,6 +245,7 @@ var app = angular.module('prototype', ['ngRoute'])
       $scope.upVotedDefects = [];
       $scope.downVotedDefects = [];
       $scope.wayOfTime = 0;
+      $scope.ticking = true;
       if (true) { //check if countdown
           $scope.time = 900;
           $scope.timeGoal = 0;
@@ -262,10 +272,12 @@ var app = angular.module('prototype', ['ngRoute'])
       };
       $scope.setClock();
       $scope.timer = function () {
-          $scope.time = $scope.time + $scope.wayOfTime;
-          $scope.setClock();
-          if ($scope.time == 0) {
-              $scope.end();
+          if ($scope.ticking) {
+              $scope.time = $scope.time + $scope.wayOfTime;
+              $scope.setClock();
+              if ($scope.time == 0) {
+                  $scope.end();
+              }
           }
       };
       $interval($scope.timer, 1000);
@@ -310,7 +322,7 @@ var app = angular.module('prototype', ['ngRoute'])
       }
       $scope.end = function () {
           $scope.wayOfTime = 0;
-          alert("Ended");
+          $scope.ticking = false;
           $location.path("/" + $scope.gameMode + "/result/" + $scope.gameID); //perhaps use the solution atempt id here
       }
   }
@@ -354,7 +366,7 @@ var app = angular.module('prototype', ['ngRoute'])
       };
   }
 
-  function gameCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService) {
+  function gameCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService, marking) {
       try {
           if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
               $scope.user = cacheService.getData("user");
@@ -367,12 +379,14 @@ var app = angular.module('prototype', ['ngRoute'])
       if (!($routeParams.gamemode == "challenge" || $routeParams.gamemode == "team")) {
           $location.path("/");
       }
-
+      $scope.firstchar = 'a1';
       var codetext = $('#code').text();
+      alert(codetext);
       var newcodetext = "";
       for (i = 1; i <= codetext.length; i++) {
-          var tempchar = '<smartchar id="a' + i + '">' + codetext[i-1] + '</smartchar>';
-          newcodetext += tempchar;
+          var tempchunk = '<smartchar id="a' + i + '">' + codetext[i-1] + '</smartchar>';
+          $scope.lastchar = 'a' + i;
+          newcodetext += tempchunk;
       }
       document.getElementById("code").innerHTML = newcodetext;
 
@@ -380,6 +394,7 @@ var app = angular.module('prototype', ['ngRoute'])
       $scope.gameMode = $routeParams.gamemode;
       $scope.gameDescription = gameSetup.load(2);
       $scope.wayOfTime = 0;
+      $scope.ticking = true;
       if (true) { //check if countdown
           $scope.time = 3600;
           $scope.timeGoal = 0;
@@ -406,10 +421,12 @@ var app = angular.module('prototype', ['ngRoute'])
       };
       $scope.setClock();
       $scope.timer = function () {
-          $scope.time = $scope.time + $scope.wayOfTime;
-          $scope.setClock();
-          if ($scope.time == 0) {
-              $scope.end();
+          if ($scope.ticking) {
+              $scope.time = $scope.time + $scope.wayOfTime;
+              $scope.setClock();
+              if ($scope.time == 0) {
+                  $scope.end();
+              }
           }
       };
       $interval($scope.timer, 1000);
@@ -455,8 +472,9 @@ var app = angular.module('prototype', ['ngRoute'])
                       if(stw != undefined && stw != null) {
                           var newdefect = new Defect($scope.defectType,stw.begin,stw.end,selectedText.text,$scope.selectedType);
                           //$scope.markText(selectedText, newdefect.id);
-                          $scope.$broadcast('text-was-selected', stw);
+                          //$scope.$broadcast('text-was-selected', stw);
                           defectList.add(newdefect);
+                          $scope.markDefects();
                       }
                   } else {
                       alert('No selection');
@@ -467,11 +485,6 @@ var app = angular.module('prototype', ['ngRoute'])
           } else {
               alert('None');
           }
-      }
-      $scope.removeDefect = function (defectID) {
-          $scope.$broadcast('text-was-selected', {begin: defectList.getByID(defectID).begin, end: defectList.getByID(defectID).end, color: ''});
-          defectList.remove(defectID);
-          $scope.markDefects();
       }
       $scope.getSelectionPosition = function () {
           var range = window.getSelection().getRangeAt(0);
@@ -499,19 +512,26 @@ var app = angular.module('prototype', ['ngRoute'])
           return wrapperElements;
       }
       $scope.clearDefects = function () {
-          for (i = 0; i < defectList.get().length; i++) {
-              $scope.$broadcast('text-was-selected', {begin: defectList.get()[i].begin, end: defectList.get()[i].end, color: ''});
-          }
+          marking.mark({begin: $scope.firstchar, end: $scope.lastchar, color: ''});
+      }
+      $scope.removeDefect = function (defectID) {
+          marking.mark({begin: defectList.getByID(defectID).begin, end: defectList.getByID(defectID).end, color: ''});
+          defectList.remove(defectID);
+          $scope.markDefects();
       }
       $scope.markDefects = function () {
-          for (i = 0; i < defectList.get().length; i++) {
-              $scope.$broadcast('text-was-selected', {begin: defectList.get()[i].begin, end: defectList.get()[i].end, color: 'rgba(0, 255, 255, 0.3)'});
+          $scope.clearDefects();
+          var i = 0;
+          while (i < defectList.get().length) {
+              marking.mark({begin: defectList.get()[i].begin, end: defectList.get()[i].end, color: 'rgba(0, 255, 255, 0.3)'});
+              i++;
           }
       }
       $scope.jumpToDefect = function (defectID) {
           $scope.markDefects();
-          $scope.$broadcast('text-was-selected', {begin: defectList.getByID(defectID).begin, end: defectList.getByID(defectID).end, color: 'orange'});
-          //TODO: jump
+          marking.mark({begin: defectList.getByID(defectID).begin, end: defectList.getByID(defectID).end, color: 'orange'});
+          //TODO: jump.
+          document.getElementById(defectList.getByID(defectID).begin).scrollIntoView();
       }
       $scope.confirmEnd = function () {
           if (confirm("Do you want to end?")) {
@@ -520,6 +540,7 @@ var app = angular.module('prototype', ['ngRoute'])
       }
       $scope.end = function () {
           $scope.wayOfTime = 0;
+          $scope.ticking = false;
           if($scope.gameMode == "challenge") {
               $location.path("/" + $scope.gameMode + "/result/" + $scope.gameID); //perhaps use the solution atempt id here
           } else if($scope.gameMode == "team") {

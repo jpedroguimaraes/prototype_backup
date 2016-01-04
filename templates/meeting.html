@@ -51,45 +51,120 @@
 	</div>
 </div>
 <div class="game">
-<pre id="code">package esof.utils;
+<pre id="code">LinkedList.java
+
+package esof.utils;
+
+/**
+ * Represents a linked list of values (objects) of any type T.
+ * Supports appending and traversing the list sequentially.
+ * Changed to also support inserting and retrieving values by
+ * position and finding a value in the list.
+*/
+public class LinkedList<T> {
+	private Node<T> firstNode = null;
+	private Node<T> lastNode = null;
+	intlength = 0;
+
+	/**
+	 * Appends a value "x" at the end of the list.
+	 */
+	public void append(T x) {
+		Node<T> newNode = new Node<T>(x);
+		if (firstNode == null)
+			firstNode = newNode;
+		else
+			lastNode.setNextNode(newNode);
+		lastNode = newNode;
+	}
+	/**
+	 * Retrieves the first node in the list (null if list is empty).
+	 * To get the value in that node and next node, see class Node.
+	*/
+	public Node<T> getFirstNode(){
+		return firstNode;
+	}
+
+	/**
+	 * Retrieves the value in position "n" of list (0 to length-1).
+	*/
+	public T getNthValue(int n){
+		Node<T> node = firstNode;
+		for (int i = 0; i < n; i++)
+			node = node.getNextNode();
+		return node.getValue();
+	}
+
+	/**
+	 * Inserts value "x" in position "n" of the list (0 to length).
+	*/
+	public void insert(T x, int n){
+		Node<T> newNode = new Node<T>(x);
+		if (n == 0) {
+			newNode.setNextNode(firstNode);
+			firstNode = newNode;
+		} else {
+			Node<T> prev = firstNode;
+			for (int i = 0; i < n; i++)
+				prev = prev.getNextNode();
+			prev.setNextNode(newNode);
+		}
+	} 
+
+	/**
+	 * Retrieves the position of the first occurrence of value "x"
+	 * in the list (between 0 and length), or -1 if not found.
+	*/
+	public int find(T x){
+		int index = -1;
+		Node<T> node = firstNode;
+		while (node != null && node.getValue().equals(x)) {
+			node = node.getNextNode();
+			index++;
+		} return index;
+	}
+}
+
+Node.java
+
+package esof.utils;
 
 /**
  * Represents a node in a linked list of values (objects) of type T.
 */
-
 public class Node<T> {
 	private T value;
-	private Node<T> nextNode;	
+	private Node<T> nextNode;
 
 	/**
 	 * Creates a new node containing a value "x".
 	 * Should only be called from LinkedList.
 	 */
-	Node(T x) { 
+	Node(T x) {
 		value = x;
 		nextNode = null;
 	}
-	
+
 	/**
 	 * Sets the next node.
 	 * Should only be called from LinkedList.
 	 */
 	void setNextNode(Node<T> nextNode) {
-		this.nextNode = nextNode; 
+		this.nextNode = nextNode;
 	}
 
 	/**
 	 * Retrieves the value stored in this node.
 	 */
 	public T getValue(){
-		return value;
+		returnvalue;
 	}
 
 	/**
 	 * Retrieves the next node (null if there is none).
 	 */
 	public Node<T> getNextNode(){
-		return nextNode;
+		returnnextNode;
 	}
 }</pre>
 </div>
