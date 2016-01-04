@@ -202,30 +202,32 @@ var app = angular.module('prototype', ['ngRoute'])
       };
   }     
 
-  function loginCtrl ($scope, $location, cacheService) {
+  function loginCtrl ($scope, $location, cacheService, $http) {
       try {
           if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
               $location.path("/");
           }
       } catch (err) { }
-      $scope.login = function() {
-          var req = {
-           method: 'POST',
-           url: 'http://revision-jpguimaraes.rhcloud.com/login',
-           data: { username: $scope.username, pw: $scope.password}
+      $scope.login = function() 
+          if($scope.username != undefined && $scope.username != null && $scope.password != undefined && $scope.password != null) {
+              var req = {
+               method: 'POST',
+               url: 'http://127.0.0.1:8080/login',
+               data: { username: $scope.username, pw: $scope.password}
+              }
+              $http(req).then(function(res) 
+                {
+                  console.log(res.data);
+                  if(res.data >= 0) {
+                    cacheService.setData("user", res.data);
+                    $location.path("/");
+                  } else {
+                    console.log("Login errado!");
+                  }
+                }, function(){
+                  console.log("Error");
+                });
           }
-          $http(req).then(function(res) 
-            {
-              alert("Connected" + res);
-            }, function(){
-              alert("Error");
-            });
-          /*if($scope.username == "teste" && $scope.password == "teste") {
-              cacheService.setData("user", "1");
-              $location.path("/");
-          } else {
-              alert("Login errado!");
-          }*/
       };
   }  
 
