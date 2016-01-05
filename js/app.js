@@ -208,27 +208,28 @@ var app = angular.module('prototype', ['ngRoute'])
               $location.path("/");
           }
       } catch (err) { }
-      $scope.login = function() 
+      $scope.login = function () {
           if($scope.username != undefined && $scope.username != null && $scope.password != undefined && $scope.password != null) {
               var req = {
-               method: 'POST',
-               url: 'http://127.0.0.1:8080/login',
-               data: { username: $scope.username, pw: $scope.password}
+                  method: 'POST',
+                  url: 'http://127.0.0.1:8080/login',
+                  data: { username: $scope.username, pw: $scope.password}
               }
               $http(req).then(function(res) 
-                {
-                  console.log(res.data);
-                  if(res.data >= 0) {
-                    cacheService.setData("user", res.data);
-                    $location.path("/");
-                  } else {
-                    console.log("Login errado!");
+                  {
+                      console.log(res.data);
+                      if(res.data >= 0) {
+                          cacheService.setData("user", res.data);
+                          $location.path("/");
+                      } else {
+                          console.log("Login errado!");
+                      }
+                  }, function(){
+                      console.log("Error");
                   }
-                }, function(){
-                  console.log("Error");
-                });
+              );
           }
-      };
+      }
   }  
 
   function meetingCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService) {
