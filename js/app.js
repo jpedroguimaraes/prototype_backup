@@ -105,6 +105,17 @@ var app = angular.module('prototype', ['ngRoute'])
       }
   });
 
+  app.factory("jaccardIndex", function (Defect) {
+      return {
+          common: function(a,b) {
+              return 32;
+          },
+          calculate: function(a, b) {
+              return ((a.code.length + b.code.length - (2 * this.common(a,b))) / (a.code.length + b.code.length - this.common(a,b)));
+          }
+      }
+  });  
+
   app.factory("defectList", function (Defect) {
       var listofdefects = [];
       return {
@@ -369,7 +380,7 @@ var app = angular.module('prototype', ['ngRoute'])
       };
   }
 
-  function gameCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService, marking) {
+  function gameCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService, marking, jaccardIndex) {
       try {
           if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
               $scope.user = cacheService.getData("user");
@@ -392,7 +403,6 @@ var app = angular.module('prototype', ['ngRoute'])
           newcodetext += tempchunk;
       }
       document.getElementById("code").innerHTML = newcodetext;
-
       $scope.gameID = $routeParams.id;
       $scope.gameMode = $routeParams.gamemode;
       $scope.gameDescription = gameSetup.load(2);
@@ -474,8 +484,6 @@ var app = angular.module('prototype', ['ngRoute'])
                       var stw = $scope.getSelectionTextWrapper();
                       if(stw != undefined && stw != null) {
                           var newdefect = new Defect($scope.defectType,stw.begin,stw.end,selectedText.text,$scope.selectedType);
-                          //$scope.markText(selectedText, newdefect.id);
-                          //$scope.$broadcast('text-was-selected', stw);
                           defectList.add(newdefect);
                           $scope.markDefects();
                       }
