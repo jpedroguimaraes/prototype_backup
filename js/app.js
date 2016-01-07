@@ -1,4 +1,4 @@
-var app = angular.module('prototype', ['ngRoute'])
+var app = angular.module('revision', ['ngRoute'])
 
   app.config(function ($routeProvider, $httpProvider) {
       $routeProvider.when('/home', {
@@ -223,20 +223,22 @@ var app = angular.module('prototype', ['ngRoute'])
           if($scope.username != undefined && $scope.username != null && $scope.password != undefined && $scope.password != null) {
               var req = {
                   method: 'POST',
-                  url: 'http://revision-jpguimaraes.rhcloud.com/login',
+                  url: 'http://127.0.0.1:8080/login',
                   data: { username: $scope.username, pw: $scope.password}
               }
               $http(req).then(function(res) 
                   {
-                      console.log(res.data);
-                      if(res.data >= 0) {
+                      if (res.data >= 0) {
+                          $scope.error = "";
                           cacheService.setData("user", res.data);
                           $location.path("/");
+                      } else if (res.data == -1) {
+                          $scope.error = "Password errada";
                       } else {
-                          console.log("Login errado!");
+                          $scope.error = "Login errado";
                       }
                   }, function(){
-                      console.log("Error");
+                      $scope.error = "Erro na conexão ao servidor. Tente outra vez.";
                   }
               );
           }
@@ -341,7 +343,7 @@ var app = angular.module('prototype', ['ngRoute'])
       }
   }
 
-  function resultCtrl ($scope, $routeParams, $location, cacheService) {
+  function resultCtrl ($scope, $routeParams, $window, $location, cacheService) {
       try {
           if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
               $scope.user = cacheService.getData("user");
@@ -351,6 +353,18 @@ var app = angular.module('prototype', ['ngRoute'])
       } catch (err) {
           $location.path("/login");
       }
+      $scope.$watch(function(){
+          var bordercorrection = 0;
+          var tempbordercorrection = getComputedStyle(document.getElementById('cellshowsolutiondefects'),null).getPropertyValue('border-width').replace('px','');
+          if(!(isNaN(tempbordercorrection))) {
+              bordercorrection = parseInt(tempbordercorrection);
+          }
+          var newheight = window.innerHeight - $("#rating").outerHeight(true) - (bordercorrection * 2);
+          document.getElementById('comparison').style.height = newheight + 'px';
+          document.getElementById('showsolutiondefects').style.height = newheight + 'px';
+          document.getElementById('showanswereddefects').style.height = newheight + 'px';
+          console.log(window.innerHeight + " : " + $("#rating").outerHeight(true) + " : " + newheight);
+      });
       $scope.resultValue = "100";
       $scope.goToRanking = function () {
           $location.path("/ranking/" + $routeParams.id);
@@ -393,9 +407,17 @@ var app = angular.module('prototype', ['ngRoute'])
       if (!($routeParams.gamemode == "challenge" || $routeParams.gamemode == "team")) {
           $location.path("/");
       }
+      $scope.$watch(function(){
+         var newheight = window.innerHeight - $("#gamemenu").outerHeight(true);
+         document.getElementById('code').style.height = newheight + 'px';
+         document.getElementById('sidemenu').style.height = newheight + 'px';
+         var newlistheight = newheight - $("#selectedtypetitle").outerHeight(true) - $("#selectedtype").outerHeight(true) - $("#gameinfo").outerHeight(true) - $("#showtime").outerHeight(true) - $("#finishbutton").outerHeight(true) - $("#foundtitle").outerHeight(true) - 30;
+         document.getElementById('listofdefects').style.height = newlistheight + 'px';
+         //console.log(document.getElementById('listofdefects').style.height);
+         //console.log(window.innerHeight + " = " + $("#gamemenu").outerHeight(true) + " + " + $("#selectedtypetitle").outerHeight(true) + " + " + $("#selectedtype").outerHeight(true) + " + " + $("#gameinfo").outerHeight(true) + " + " + $("#showtime").outerHeight(true) + " + " + $("#finishbutton").outerHeight(true) + " + " + $("#foundtitle").outerHeight(true));
+      });
       $scope.firstchar = 'a1';
       var codetext = $('#code').text();
-      alert(codetext);
       var newcodetext = "";
       for (i = 1; i <= codetext.length; i++) {
           var tempchunk = '<smartchar id="a' + i + '">' + codetext[i-1] + '</smartchar>';
@@ -444,7 +466,7 @@ var app = angular.module('prototype', ['ngRoute'])
       };
       $interval($scope.timer, 1000);
       $scope.defects = defectList.get();
-      $scope.selectedType = "";
+      $scope.selectedType = "-";
       $scope.defectType = -1;
       $scope.minorDefect = 'unselectedMenuOption';
       $scope.majorDefect = 'unselectedMenuOption';
