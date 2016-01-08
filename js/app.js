@@ -41,21 +41,22 @@ var app = angular.module('revision', ['ngRoute'])
   app.factory('marking', function () {
       return {
           mark: function(params) { //put target color in params
-              console.log("directive");
+              //console.log("directive");
+              var target = params['target'];
               var begin = parseInt(params['begin'].split('a')[1]);
               var end = parseInt(params['end'].split('a')[1]);
               var color = params['color'];
-              console.log("changed: " + begin + " to " + end + " : " + color);
+              //console.log("changed: " + begin + " to " + end + " : " + color);
               if(end > begin) {
                   for (i = begin; i <= end; i++) {
-                      document.querySelector("#a"+i).style.backgroundColor = color;
+                      document.getElementById(target).querySelector("#a"+i).style.backgroundColor = color;
                   }
               } else {
                   var temp = begin;
                   begin = end;
                   end = temp;
                   for (i = begin; i <= end; i++) {
-                      document.querySelector("#a"+i).style.backgroundColor = color;
+                      document.getElementById(target).style.backgroundColor = color;
                   }
               }
           }
@@ -255,6 +256,23 @@ var app = angular.module('revision', ['ngRoute'])
       } catch (err) {
           $location.path("/login");
       }
+      $scope.$watch(function(){
+         var newheight = window.innerHeight;
+         document.getElementById('code').style.height = newheight + 'px';
+         document.getElementById('sidemenu').style.height = newheight + 'px';
+         var newlistheight = newheight - $("#gameinfo").outerHeight(true) - $("#chat").outerHeight(true) - $("#showtime").outerHeight(true) - $("#finishbutton").outerHeight(true) - $("#foundtitle").outerHeight(true) - 30;
+         document.getElementById('listofdefects').style.height = newlistheight + 'px';
+         console.log(window.innerHeight + " = " + $("#chat").outerHeight(true) + " + " + $("#gameinfo").outerHeight(true) + " + " + $("#showtime").outerHeight(true) + " + " + $("#finishbutton").outerHeight(true) + " + " + $("#foundtitle").outerHeight(true) + " + " + $("#listofdefects").outerHeight(true));
+      });
+      $scope.firstchar = 'a1';
+      var codetext = $('#code').text();
+      var newcodetext = "";
+      for (i = 1; i <= codetext.length; i++) {
+          var tempchunk = '<smartchar id="a' + i + '">' + codetext[i-1] + '</smartchar>';
+          $scope.lastchar = 'a' + i;
+          newcodetext += tempchunk;
+      }
+      document.getElementById("code").innerHTML = newcodetext;
       $scope.gameID = $routeParams.id;
       $scope.gameMode = $routeParams.gamemode;
       $scope.gameDescription = gameSetup.load(2);
@@ -298,8 +316,22 @@ var app = angular.module('revision', ['ngRoute'])
       };
       $interval($scope.timer, 1000);
       $scope.defects = defectList.get();
-      var newdefect = new Defect(0,10,20,"batatas",'lol');
+      var newdefect = new Defect(0,'a10','a20',"batatas",'lol');
+      var newdefect2 = new Defect(1,'a30','a20',"batatas",'lol');
+      var newdefect3 = new Defect(0,'a50','a20',"batatas",'lol');
+      var newdefect4 = new Defect(1,'a70','a20',"batatas",'lol');
+      var newdefect5 = new Defect(0,'a1','a5',"batatas",'lol');
+      var newdefect6 = new Defect(1,'a100','a220',"batatas",'lol');
+      var newdefect7 = new Defect(1,'a110','a120',"batatas",'lol');
+      var newdefect8 = new Defect(0,'a15','a16',"batatas",'lol');
       defectList.add(newdefect);
+      defectList.add(newdefect2);
+      defectList.add(newdefect3);
+      defectList.add(newdefect4);
+      defectList.add(newdefect5);
+      defectList.add(newdefect6);
+      defectList.add(newdefect7);
+      defectList.add(newdefect8);
       $scope.toggleSelectionDefect = function (defectID) {
           defectList.toggleSelection(defectID);
       }
@@ -545,10 +577,10 @@ var app = angular.module('revision', ['ngRoute'])
           return wrapperElements;
       }
       $scope.clearDefects = function () {
-          marking.mark({begin: $scope.firstchar, end: $scope.lastchar, color: ''});
+          marking.mark({target: 'code', begin: $scope.firstchar, end: $scope.lastchar, color: ''});
       }
       $scope.removeDefect = function (defectID) {
-          marking.mark({begin: defectList.getByID(defectID).begin, end: defectList.getByID(defectID).end, color: ''});
+          marking.mark({target: 'code', begin: defectList.getByID(defectID).begin, end: defectList.getByID(defectID).end, color: ''});
           defectList.remove(defectID);
           $scope.markDefects();
       }
@@ -556,14 +588,13 @@ var app = angular.module('revision', ['ngRoute'])
           $scope.clearDefects();
           var i = 0;
           while (i < defectList.get().length) {
-              marking.mark({begin: defectList.get()[i].begin, end: defectList.get()[i].end, color: 'rgba(0, 255, 255, 0.3)'});
+              marking.mark({target: 'code', begin: defectList.get()[i].begin, end: defectList.get()[i].end, color: 'rgba(0, 255, 255, 0.3)'});
               i++;
           }
       }
       $scope.jumpToDefect = function (defectID) {
           $scope.markDefects();
-          marking.mark({begin: defectList.getByID(defectID).begin, end: defectList.getByID(defectID).end, color: 'orange'});
-          //TODO: jump.
+          marking.mark({target: 'code', begin: defectList.getByID(defectID).begin, end: defectList.getByID(defectID).end, color: 'orange'});
           document.getElementById(defectList.getByID(defectID).begin).scrollIntoView();
       }
       $scope.confirmEnd = function () {
