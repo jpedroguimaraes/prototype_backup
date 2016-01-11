@@ -15,7 +15,7 @@
 		<h2 id="foundtitle">Found</h2>
 		<div id="listofdefects" class="listofdefects">
 			<ul>
-				<li ng-repeat="defect in defects" ng-class="{ 'unselectedDefectListed' : defect.active == false , 'minorDefectListed' : (defect.type == 0 && defect.active == true) , 'majorDefectListed' : (defect.type == 1 && defect.active == true) }">
+				<li ng-repeat="defect in defects | orderBy:'position'" ng-class="{ 'unselectedDefectListed' : defect.active == false , 'minorDefectListed' : (defect.type == 0 && defect.active == true) , 'majorDefectListed' : (defect.type == 1 && defect.active == true) }">
 					<table>
 						<tr>
 							<td ng-class="defectcell">

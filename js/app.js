@@ -162,7 +162,7 @@ var app = angular.module('revision', ['ngRoute'])
       this.id = 'd' + defectID;
       this.type = type;
       this.begin = begin;
-      this.position = begin.replace(/\D/g,'');
+      this.position = parseInt(begin.replace(/\D/g,''));
       console.log(this.position);
       this.end = end;
       this.code = code;
