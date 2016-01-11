@@ -56,7 +56,7 @@ var app = angular.module('revision', ['ngRoute'])
                   begin = end;
                   end = temp;
                   for (i = begin; i <= end; i++) {
-                      document.getElementById(target).style.backgroundColor = color;
+                      document.getElementById(target).querySelector("#a"+i).style.backgroundColor = color;
                   }
               }
           }
@@ -162,6 +162,8 @@ var app = angular.module('revision', ['ngRoute'])
       this.id = 'd' + defectID;
       this.type = type;
       this.begin = begin;
+      this.position = begin.replace(/\D/g,'');
+      console.log(this.position);
       this.end = end;
       this.code = code;
       this.description = description;
@@ -246,7 +248,7 @@ var app = angular.module('revision', ['ngRoute'])
       }
   }  
 
-  function meetingCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService) {
+  function meetingCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService, marking) {
       try {
           if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
               $scope.user = cacheService.getData("user");
@@ -316,6 +318,8 @@ var app = angular.module('revision', ['ngRoute'])
       };
       $interval($scope.timer, 1000);
       $scope.defects = defectList.get();
+
+      // CENAS PARA TESTE
       var newdefect = new Defect(0,'a10','a20',"batatas",'lol');
       var newdefect2 = new Defect(1,'a30','a20',"batatas",'lol');
       var newdefect3 = new Defect(0,'a50','a20',"batatas",'lol');
@@ -323,7 +327,7 @@ var app = angular.module('revision', ['ngRoute'])
       var newdefect5 = new Defect(0,'a1','a5',"batatas",'lol');
       var newdefect6 = new Defect(1,'a100','a220',"batatas",'lol');
       var newdefect7 = new Defect(1,'a110','a120',"batatas",'lol');
-      var newdefect8 = new Defect(0,'a15','a16',"batatas",'lol');
+      var newdefect8 = new Defect(0,'a150','a500',"batatas",'lol');
       defectList.add(newdefect);
       defectList.add(newdefect2);
       defectList.add(newdefect3);
@@ -332,8 +336,37 @@ var app = angular.module('revision', ['ngRoute'])
       defectList.add(newdefect6);
       defectList.add(newdefect7);
       defectList.add(newdefect8);
+      // CENAS PARA TESTE
+
+      $scope.clearDefects = function () {
+          marking.mark({target: 'code', begin: $scope.firstchar, end: $scope.lastchar, color: ''});
+      }
+      $scope.markDefects = function () {
+          $scope.clearDefects();
+          var i = 0;
+          while (i < defectList.get().length) {
+              var activemark = '0.2';
+              if (defectList.get()[i].active) {
+                  activemark = '0.5';
+              }
+              var markcolor = 'rgba(0, 255, 255, 0.3)';
+              if (defectList.get()[i].type == 0) {
+                  markcolor = 'rgba(255, 255, 0, ' + activemark + ')';
+              } else if (defectList.get()[i].type == 1) {
+                  markcolor = 'rgba(255, 0, 0, ' + activemark + ')';
+              }
+              marking.mark({target: 'code', begin: defectList.get()[i].begin, end: defectList.get()[i].end, color: markcolor});
+              i++;
+          }
+      }
+      $scope.markDefects();
+      $scope.jumpToDefect = function (defectID) {
+          $scope.markDefects();
+          document.getElementById(defectList.getByID(defectID).begin).scrollIntoView();
+      }
       $scope.toggleSelectionDefect = function (defectID) {
           defectList.toggleSelection(defectID);
+          $scope.markDefects();
       }
       $scope.upVoted = function (defectID) {
           return ($scope.upVotedDefects.indexOf(defectID) >= 0);
