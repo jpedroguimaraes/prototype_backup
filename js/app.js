@@ -224,7 +224,7 @@ var app = angular.module('revision', ['ngRoute'])
           if($scope.username != undefined && $scope.username != null && $scope.password != undefined && $scope.password != null) {
               var req = {
                   method: 'POST',
-                  url: 'http://127.0.0.1:8080/login',
+                  url: 'http://revision-jpguimaraes.rhcloud.com/login',
                   data: { username: $scope.username, pw: $scope.password}
               }
               $http(req).then(function(res) 
