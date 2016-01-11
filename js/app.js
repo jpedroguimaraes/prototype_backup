@@ -408,7 +408,7 @@ var app = angular.module('revision', ['ngRoute'])
       }
   }
 
-  function resultCtrl ($scope, $routeParams, $window, $location, cacheService) {
+  function resultCtrl ($scope, $routeParams, $interval, $window, $location, cacheService, marking) {
       try {
           if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
               $scope.user = cacheService.getData("user");
@@ -419,6 +419,7 @@ var app = angular.module('revision', ['ngRoute'])
           $location.path("/login");
       }
       $scope.$watch(function(){
+        console.log("Aaaaaaaaaaaaaa");
           var bordercorrection = 0;
           var tempbordercorrection = getComputedStyle(document.getElementById('cellshowsolutiondefects'),null).getPropertyValue('border-width').replace('px','');
           if(!(isNaN(tempbordercorrection))) {
@@ -429,7 +430,40 @@ var app = angular.module('revision', ['ngRoute'])
           document.getElementById('showsolutiondefects').style.height = newheight + 'px';
           document.getElementById('showanswereddefects').style.height = newheight + 'px';
           console.log(window.innerHeight + " : " + $("#rating").outerHeight(true) + " : " + newheight);
-      });
+      }, true);
+      $scope.firstchar = 'a1';
+      var codetext = $('#showsolutiondefects').text();
+      var newcodetext = "";
+      for (i = 1; i <= codetext.length; i++) {
+          var tempchunk = '<smartchar id="a' + i + '">' + codetext[i-1] + '</smartchar>';
+          $scope.lastchar = 'a' + i;
+          newcodetext += tempchunk;
+      }
+      document.getElementById("showsolutiondefects").innerHTML = newcodetext;
+      document.getElementById("showanswereddefects").innerHTML = newcodetext;
+      $scope.clearDefects = function () {
+          marking.mark({target: 'showsolutiondefects', begin: $scope.firstchar, end: $scope.lastchar, color: ''});
+          marking.mark({target: 'showanswereddefects', begin: $scope.firstchar, end: $scope.lastchar, color: ''});
+      }
+      $scope.markDefects = function () { // green ok, yellow incomplete, red wrong on the right. maybe have colored solutions on the left (like meeting page)
+          $scope.clearDefects();
+          /*var i = 0;
+          while (i < defectList.get().length) {
+              var activemark = '0.2';
+              if (defectList.get()[i].active) {
+                  activemark = '0.5';
+              }
+              var markcolor = 'rgba(0, 255, 255, 0.3)';
+              if (defectList.get()[i].type == 0) {
+                  markcolor = 'rgba(255, 255, 0, ' + activemark + ')';
+              } else if (defectList.get()[i].type == 1) {
+                  markcolor = 'rgba(255, 0, 0, ' + activemark + ')';
+              }
+              marking.mark({target: 'code', begin: defectList.get()[i].begin, end: defectList.get()[i].end, color: markcolor});
+              i++;
+          }*/
+      }
+      $scope.markDefects();
       $scope.resultValue = "100";
       $scope.goToRanking = function () {
           $location.path("/ranking/" + $routeParams.id);
