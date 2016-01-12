@@ -15,14 +15,14 @@
 		<h2 id="foundtitle">Found</h2>
 		<div id="listofdefects" class="listofdefects">
 			<ul>
-				<li ng-repeat="defect in defects | orderBy:'position'" ng-class="{ 'unselectedDefectListed' : defect.active == false , 'minorDefectListed' : (defect.type == 0 && defect.active == true) , 'majorDefectListed' : (defect.type == 1 && defect.active == true) }">
+				<li ng-repeat="defect in defects | orderBy:'begin'" ng-class="{ 'unselectedDefectListed' : defect.active == false , 'minorDefectListed' : (defect.type == 0 && defect.active == true) , 'majorDefectListed' : (defect.type == 1 && defect.active == true) }">
 					<table>
 						<tr>
 							<td ng-class="defectcell">
 								<a href="" ng-click="jumpToDefect(defect.id)">{{defect.description}}</a>
 							</td>
 							<td ng-class="removecell">
-								<span ng-if="role">
+								<span ng-if="captain">
 									<table class="votingbuttons">
 										<tr>
 											<td>
@@ -34,7 +34,7 @@
 										</tr>
 									</table>
 								</span>
-								<span ng-if="role == false">
+								<span ng-if="captain == false">
 									<table class="votingbuttons">
 										<tr>
 											<td ng-class="upVoted(defect.id) ? 'upvoted' : ''"><a ng-click="voteDefectUp(defect.id)" href="">{{defect.upVotes}}</a></td>

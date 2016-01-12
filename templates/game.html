@@ -18,7 +18,7 @@
 </div>
 <div id="sidemenu" class="sidemenu">
 	<h3 id="selectedtypetitle">Selected Type</h3>
-	<div id="selectedtype">{{selectedType}}</div>
+	<div id="selectedtype"><span ng-if="selectedType == ''"> - </span><span ng-if="selectedType != ''">{{selectedType}}</span></div>
 	<div id="gameinfo">
 		<h1>{{gameMode | capitalize}}</b></h1>
 		<h3>Game #{{gameID}}</h3>
@@ -31,7 +31,7 @@
 		<h2 id="foundtitle">Found</h2>
 		<div id="listofdefects" class="listofdefects">
 			<ul>
-				<li ng-repeat="defect in defects | orderBy:'position'" ng-class="{minorDefectListed: defect.type == 0, majorDefectListed: defect.type == 1}">
+				<li ng-repeat="defect in defects | orderBy:'begin'" ng-class="{minorDefectListed: defect.type == 0, majorDefectListed: defect.type == 1}">
 					<table class="defectlisttable"><tr id="{{defect.id}}"><td id="defectdescriptioncell"><a href="" ng-click="jumpToDefect(defect.id)">{{defect.description}}</a></td><td id="removedefectcell"><a ng-mouseenter="hoverRemoveButton(defect.id)" ng-mouseleave="leaveRemoveButton(defect.id)" ng-click="removeDefect(defect.id)" href="">X</a></td></tr></table>
 				</li>
 			</ul>

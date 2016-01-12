@@ -25,6 +25,10 @@ var app = angular.module('revision', ['ngRoute'])
           controller: rankingCtrl,
           templateUrl: 'templates/ranking.html'
       });
+      $routeProvider.when('/team/:nextstep/wait/:id', {
+          controller: waitingCtrl,
+          templateUrl: 'templates/waiting.html'
+      });
       $routeProvider.otherwise({
           redirectTo : '/home'
       });
@@ -43,8 +47,8 @@ var app = angular.module('revision', ['ngRoute'])
           mark: function(params) { //put target color in params
               //console.log("directive");
               var target = params['target'];
-              var begin = parseInt(params['begin'].split('a')[1]);
-              var end = parseInt(params['end'].split('a')[1]);
+              var begin = parseInt(params['begin']);
+              var end = parseInt(params['end']);
               var color = params['color'];
               //console.log("changed: " + begin + " to " + end + " : " + color);
               if(end > begin) {
@@ -158,18 +162,17 @@ var app = angular.module('revision', ['ngRoute'])
 
   app.factory('Defect', function () {
     var defectID = 0;
-    function Defect(type, begin, end, code, description) {
+    function Defect(type, begin, end, code, description, finder) {
       this.id = 'd' + defectID;
       this.type = type;
       this.begin = begin;
-      this.position = parseInt(begin.replace(/\D/g,''));
-      console.log(this.position);
       this.end = end;
       this.code = code;
       this.description = description;
       this.active = true;
       this.upVotes = 0;
       this.downVotes = 0;
+      this.finder = finder;
       defectID++;
     }
     return Defect;
@@ -320,14 +323,14 @@ var app = angular.module('revision', ['ngRoute'])
       $scope.defects = defectList.get();
 
       // CENAS PARA TESTE
-      var newdefect = new Defect(0,'a10','a20',"batatas",'lol');
-      var newdefect2 = new Defect(1,'a30','a20',"batatas",'lol');
-      var newdefect3 = new Defect(0,'a50','a20',"batatas",'lol');
-      var newdefect4 = new Defect(1,'a70','a20',"batatas",'lol');
-      var newdefect5 = new Defect(0,'a1','a5',"batatas",'lol');
-      var newdefect6 = new Defect(1,'a100','a220',"batatas",'lol');
-      var newdefect7 = new Defect(1,'a110','a120',"batatas",'lol');
-      var newdefect8 = new Defect(0,'a150','a500',"batatas",'lol');
+      var newdefect = new Defect(0,'a10','a20',"batatas",'lol',$scope.user);
+      var newdefect2 = new Defect(1,'a30','a20',"batatas",'lol',$scope.user);
+      var newdefect3 = new Defect(0,'a50','a20',"batatas",'lol',$scope.user);
+      var newdefect4 = new Defect(1,'a70','a20',"batatas",'lol',$scope.user);
+      var newdefect5 = new Defect(0,'a1','a5',"batatas",'lol',$scope.user);
+      var newdefect6 = new Defect(1,'a100','a220',"batatas",'lol',$scope.user);
+      var newdefect7 = new Defect(1,'a110','a120',"batatas",'lol',$scope.user);
+      var newdefect8 = new Defect(0,'a150','a500',"batatas",'lol',$scope.user);
       defectList.add(newdefect);
       defectList.add(newdefect2);
       defectList.add(newdefect3);
@@ -394,17 +397,34 @@ var app = angular.module('revision', ['ngRoute'])
               }
           }
       }
-      $scope.role = true;
+      $scope.captain = true;
       $scope.confirmEnd = function () {
-          /*if (confirm("Do you want to end?")) {
+          if (confirm("Do you want to end?")) {
               $scope.end();
-          }*/
-          $scope.role = !($scope.role);
+          }
+          //$scope.captain = !($scope.captain);
       }
       $scope.end = function () {
           $scope.wayOfTime = 0;
           $scope.ticking = false;
-          $location.path("/" + $scope.gameMode + "/result/" + $scope.gameID); //perhaps use the solution atempt id here
+          $location.path("/" + $scope.gameMode + "/result/wait/" + $scope.gameID); //perhaps use the solution atempt id here
+      }
+  }
+
+  function waitingCtrl ($scope, $routeParams, $interval, $window, $location, cacheService, marking) {
+      try {
+          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
+              $scope.user = cacheService.getData("user");
+          } else {
+              $location.path("/login");
+          }
+      } catch (err) {
+          $location.path("/login");
+      }
+      $scope.gameID = $routeParams.id;
+      $scope.nextStep = $routeParams.nextstep;
+      $scope.goToNextStep = function () {
+          $location.path("/team/" + $scope.nextStep + "/" + $routeParams.id);
       }
   }
 
@@ -565,7 +585,7 @@ var app = angular.module('revision', ['ngRoute'])
       };
       $interval($scope.timer, 1000);
       $scope.defects = defectList.get();
-      $scope.selectedType = "-";
+      $scope.selectedType = "";
       $scope.defectType = -1;
       $scope.minorDefect = 'unselectedMenuOption';
       $scope.majorDefect = 'unselectedMenuOption';
@@ -601,12 +621,16 @@ var app = angular.module('revision', ['ngRoute'])
           if ($scope.defectType == 0 || $scope.defectType == 1) {
               if($scope.selectedType != "" && $scope.selectedType != null) {
                   var selectedText = $scope.getSelectionPosition();
-                  if (selectedText.text != "" && selectedText.text != null && selectedText.text != undefined) {
+                  if (selectedText.start != undefined && selectedText.start != null && selectedText.start > -1 && selectedText.end != undefined && selectedText.end != null && selectedText.end > -1 && selectedText.text != "" && selectedText.text != null && selectedText.text != undefined) {
                       var stw = $scope.getSelectionTextWrapper();
-                      if(stw != undefined && stw != null) {
-                          var newdefect = new Defect($scope.defectType,stw.begin,stw.end,selectedText.text,$scope.selectedType);
+                      if(stw != undefined && stw != null && stw.begin != undefined && stw.begin != null && parseInt(stw.begin) > -1 && stw.end != undefined && stw.end != null && parseInt(stw.end) > -1) {
+                          console.log(stw.end + " : " + parseInt($scope.lastchar.split('a')[1]));
+                          if (stw.end > parseInt($scope.lastchar.split('a')[1])) { stw.end = parseInt($scope.lastchar.split('a')[1]); }
+                          var newdefect = new Defect($scope.defectType,stw.begin,stw.end,selectedText.text,$scope.selectedType,$scope.user);
                           defectList.add(newdefect);
                           $scope.markDefects();
+                      } else {
+                        alert('No selection');
                       }
                   } else {
                       alert('No selection');
@@ -635,7 +659,7 @@ var app = angular.module('revision', ['ngRoute'])
           if (window.getSelection) {
               selection = window.getSelection();
               if (selection.rangeCount) {
-                  wrapperElements = {begin:selection.anchorNode.parentNode.id, end: selection.focusNode.parentNode.id, color: 'rgba(0, 255, 255, 0.3)'};
+                  wrapperElements = {begin: parseInt(selection.anchorNode.parentNode.id.split('a')[1]), end: parseInt(selection.focusNode.parentNode.id.split('a')[1]), color: 'rgba(0, 255, 255, 0.3)'};
               }
           } else if (document.selection && document.selection.type != "Control") {
               //Tratar deste caso
@@ -675,7 +699,7 @@ var app = angular.module('revision', ['ngRoute'])
           if($scope.gameMode == "challenge") {
               $location.path("/" + $scope.gameMode + "/result/" + $scope.gameID); //perhaps use the solution atempt id here
           } else if($scope.gameMode == "team") {
-              $location.path("/" + $scope.gameMode + "/meeting/" + $scope.gameID); //perhaps use the solution atempt id here
+              $location.path("/" + $scope.gameMode + "/meeting/wait/" + $scope.gameID); //perhaps use the solution atempt id here
           }
       }
       $scope.hoverRemoveButton = function (defectID) {
