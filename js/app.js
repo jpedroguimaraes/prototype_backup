@@ -188,12 +188,12 @@ var app = angular.module('revision', ['ngRoute'])
       $scope.testConnection = function() {
           var req = {
            method: 'GET',
-           url: 'http://revision-jpguimaraes.rhcloud.com/',
-           data: { test: 'teste'}
+           url: 'http://revision-jpguimaraes.rhcloud.com/test'//,
+           //data: { test: 'teste'}
           }
           $http(req).then(function(res) 
             {
-              alert("Connected");
+              alert("Connected " + JSON.parse(res.data));
             }, function(){
               alert("Error");
             });
@@ -233,7 +233,7 @@ var app = angular.module('revision', ['ngRoute'])
                   {
                       if (res.data >= 0) {
                           $scope.error = "";
-                          cacheService.setData("user", res.data);
+                          cacheService.setData("user", JSON.parse(res.data));
                           $location.path("/");
                       } else if (res.data == -1) {
                           $scope.error = "Password errada";
