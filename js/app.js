@@ -165,8 +165,8 @@ var app = angular.module('revision', ['ngRoute'])
     function Defect(type, begin, end, code, description, finder) {
       this.id = 'd' + defectID;
       this.type = type;
-      this.begin = begin;
-      this.end = end;
+      this.begin = parseInt(begin);
+      this.end = parseInt(end);
       this.code = code;
       this.description = description;
       this.active = true;
@@ -267,7 +267,7 @@ var app = angular.module('revision', ['ngRoute'])
          document.getElementById('sidemenu').style.height = newheight + 'px';
          var newlistheight = newheight - $("#gameinfo").outerHeight(true) - $("#chat").outerHeight(true) - $("#showtime").outerHeight(true) - $("#finishbutton").outerHeight(true) - $("#foundtitle").outerHeight(true) - 30;
          document.getElementById('listofdefects').style.height = newlistheight + 'px';
-         console.log(window.innerHeight + " = " + $("#chat").outerHeight(true) + " + " + $("#gameinfo").outerHeight(true) + " + " + $("#showtime").outerHeight(true) + " + " + $("#finishbutton").outerHeight(true) + " + " + $("#foundtitle").outerHeight(true) + " + " + $("#listofdefects").outerHeight(true));
+         //console.log(window.innerHeight + " = " + $("#chat").outerHeight(true) + " + " + $("#gameinfo").outerHeight(true) + " + " + $("#showtime").outerHeight(true) + " + " + $("#finishbutton").outerHeight(true) + " + " + $("#foundtitle").outerHeight(true) + " + " + $("#listofdefects").outerHeight(true));
       });
       $scope.firstchar = 'a1';
       var codetext = $('#code').text();
@@ -323,14 +323,17 @@ var app = angular.module('revision', ['ngRoute'])
       $scope.defects = defectList.get();
 
       // CENAS PARA TESTE
-      var newdefect = new Defect(0,'a10','a20',"batatas",'lol',$scope.user);
-      var newdefect2 = new Defect(1,'a30','a20',"batatas",'lol',$scope.user);
-      var newdefect3 = new Defect(0,'a50','a20',"batatas",'lol',$scope.user);
-      var newdefect4 = new Defect(1,'a70','a20',"batatas",'lol',$scope.user);
-      var newdefect5 = new Defect(0,'a1','a5',"batatas",'lol',$scope.user);
-      var newdefect6 = new Defect(1,'a100','a220',"batatas",'lol',$scope.user);
-      var newdefect7 = new Defect(1,'a110','a120',"batatas",'lol',$scope.user);
-      var newdefect8 = new Defect(0,'a150','a500',"batatas",'lol',$scope.user);
+      var newdefect = new Defect(0,'10','20',"batatas",'lol',$scope.user);
+      var newdefect2 = new Defect(1,'30','20',"batatas",'lol',$scope.user);
+      var newdefect3 = new Defect(0,'50','20',"batatas",'lol',$scope.user);
+      var newdefect4 = new Defect(1,'70','20',"batatas",'lol',$scope.user);
+      var newdefect5 = new Defect(0,'1','5',"batatas",'lol',$scope.user);
+      var newdefect6 = new Defect(1,'100','220',"batatas",'lol',$scope.user);
+      var newdefect7 = new Defect(1,'110','120',"batatas",'lol',$scope.user);
+      var newdefect8 = new Defect(0,'150','500',"batatas",'lol',$scope.user);
+      var newdefect9 = new Defect(1,'100','220',"batatas",'lol',$scope.user);
+      var newdefect10 = new Defect(1,'110','120',"batatas",'lol',$scope.user);
+      var newdefect11 = new Defect(0,'500','700',"batatas",'lol',$scope.user);
       defectList.add(newdefect);
       defectList.add(newdefect2);
       defectList.add(newdefect3);
@@ -339,28 +342,33 @@ var app = angular.module('revision', ['ngRoute'])
       defectList.add(newdefect6);
       defectList.add(newdefect7);
       defectList.add(newdefect8);
+      defectList.add(newdefect9);
+      defectList.add(newdefect10);
+      defectList.add(newdefect11);
       // CENAS PARA TESTE
 
       $scope.clearDefects = function () {
           marking.mark({target: 'code', begin: $scope.firstchar, end: $scope.lastchar, color: ''});
       }
-      $scope.markDefects = function () {
-          $scope.clearDefects();
+      $scope.markExistingDefects = function (activemark, value) {
           var i = 0;
           while (i < defectList.get().length) {
-              var activemark = '0.2';
-              if (defectList.get()[i].active) {
-                  activemark = '0.5';
+              if (defectList.get()[i].active == activemark) {
+                  var markcolor = 'rgba(0, 255, 255, 0.3)';
+                  if (defectList.get()[i].type == 0) {
+                      markcolor = 'rgba(255, 255, 0, ' + value + ')';
+                  } else if (defectList.get()[i].type == 1) {
+                      markcolor = 'rgba(255, 0, 0, ' + value + ')';
+                  }
+                  marking.mark({target: 'code', begin: defectList.get()[i].begin, end: defectList.get()[i].end, color: markcolor});
               }
-              var markcolor = 'rgba(0, 255, 255, 0.3)';
-              if (defectList.get()[i].type == 0) {
-                  markcolor = 'rgba(255, 255, 0, ' + activemark + ')';
-              } else if (defectList.get()[i].type == 1) {
-                  markcolor = 'rgba(255, 0, 0, ' + activemark + ')';
-              }
-              marking.mark({target: 'code', begin: defectList.get()[i].begin, end: defectList.get()[i].end, color: markcolor});
               i++;
           }
+      }
+      $scope.markDefects = function () {
+          $scope.clearDefects();
+          $scope.markExistingDefects(false,0.2);
+          $scope.markExistingDefects(true,0.5);
       }
       $scope.markDefects();
       $scope.jumpToDefect = function (defectID) {
@@ -407,7 +415,11 @@ var app = angular.module('revision', ['ngRoute'])
       $scope.end = function () {
           $scope.wayOfTime = 0;
           $scope.ticking = false;
+          $scope.getResults();
           $location.path("/" + $scope.gameMode + "/result/wait/" + $scope.gameID); //perhaps use the solution atempt id here
+      } 
+      $scope.getResults = function () {
+        
       }
   }
 
@@ -696,11 +708,15 @@ var app = angular.module('revision', ['ngRoute'])
       $scope.end = function () {
           $scope.wayOfTime = 0;
           $scope.ticking = false;
+          $scope.getResults();
           if($scope.gameMode == "challenge") {
               $location.path("/" + $scope.gameMode + "/result/" + $scope.gameID); //perhaps use the solution atempt id here
           } else if($scope.gameMode == "team") {
               $location.path("/" + $scope.gameMode + "/meeting/wait/" + $scope.gameID); //perhaps use the solution atempt id here
           }
+      }
+      $scope.getResults = function () {
+
       }
       $scope.hoverRemoveButton = function (defectID) {
           $("#"+defectID).find("#removedefectcell").css("background-color", "white");
