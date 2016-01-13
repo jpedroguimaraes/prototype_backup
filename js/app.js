@@ -188,18 +188,29 @@ var app = angular.module('revision', ['ngRoute'])
       } catch (err) {
           $location.path("/login");
       }
+      $scope.dump = function (obj) {
+          var out = '';
+          for (var i in obj) {
+              out += i + ": " + obj[i] + "\n";
+          }
+          alert(out);
+          // or, if you wanted to avoid alerts...
+          //var pre = document.createElement('pre');
+          //pre.innerHTML = out;
+          //document.body.appendChild(pre)
+      }
       $scope.testConnection = function() {
           var req = {
            method: 'GET',
            url: 'http://revision-jpguimaraes.rhcloud.com/test'//,
            //data: { test: 'teste'}
           }
-          $http(req).then(function(res) 
-            {
-              alert("Connected " + JSON.parse(res.data));
+          $http(req).then(function(res) {
+              var stuff = res.data;
+              console.log("Connected: " + stuff[0].id + " " + stuff[0].username + " " + stuff[0].password);
             }, function(){
-              alert("Error");
-            });
+              console.log("Error");
+          });
       };
       $scope.goToChallengeGame = function(id) {
           $location.path("/challenge/game/" + id);
@@ -217,7 +228,24 @@ var app = angular.module('revision', ['ngRoute'])
           cacheService.clearAll();
           $location.path("/");
       };
-  }     
+  } 
+
+  function waitingCtrl ($scope, $routeParams, $interval, $window, $location, cacheService, marking) {
+      try {
+          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
+              $scope.user = cacheService.getData("user");
+          } else {
+              $location.path("/login");
+          }
+      } catch (err) {
+          $location.path("/login");
+      }
+      $scope.gameID = $routeParams.id;
+      $scope.nextStep = $routeParams.nextstep;
+      $scope.goToNextStep = function () {
+          $location.path("/team/" + $scope.nextStep + "/" + $routeParams.id);
+      }
+  }    
 
   function loginCtrl ($scope, $location, cacheService, $http) {
       try {
@@ -225,31 +253,114 @@ var app = angular.module('revision', ['ngRoute'])
               $location.path("/");
           }
       } catch (err) { }
-      $scope.login = function () {
+      $scope.login = function () { console.log($scope.username + " : " + $scope.password);
           if($scope.username != undefined && $scope.username != null && $scope.password != undefined && $scope.password != null) {
               var req = {
                   method: 'POST',
                   url: 'http://revision-jpguimaraes.rhcloud.com/login',
                   data: { username: $scope.username, pw: $scope.password}
               }
-              $http(req).then(function(res) 
-                  {
-                      if (res.data >= 0) {
-                          $scope.error = "";
-                          cacheService.setData("user", JSON.parse(res.data));
-                          $location.path("/");
-                      } else if (res.data == -1) {
-                          $scope.error = "Password errada";
-                      } else {
-                          $scope.error = "Login errado";
-                      }
-                  }, function(){
-                      $scope.error = "Erro na conexão ao servidor. Tente outra vez.";
-                  }
-              );
+              $http(req).then(function(res) {
+                  var userinfo = res.data[0]; console.log(res.data);
+                  /*if (res.data >= 0) {
+                      $scope.error = "";
+                      cacheService.setData("userid", JSON.parse(userinfo.id));
+                      cacheService.setData("nameuser", JSON.parse(userinfo.username));
+                      $location.path("/");
+                  } else {
+                      $scope.error = "Wrong credentials";
+                  }*/
+              }, function(){
+                  $scope.error = "Connection error";
+              });
           }
       }
-  }  
+  } 
+
+  function rankingCtrl ($scope, $routeParams, $location, cacheService) {
+      try {
+          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
+              $scope.user = cacheService.getData("user");
+          } else {
+              $location.path("/login");
+          }
+      } catch (err) {
+          $location.path("/login");
+      }
+      $scope.gameID = $routeParams.id;
+      $scope.goToHome = function () {
+          $location.path("/home");
+      }
+      $scope.logout = function() {
+          cacheService.clearAll();
+          $location.path("/");
+      };
+  } 
+
+  function resultCtrl ($scope, $routeParams, $interval, $window, $location, cacheService, marking) {
+      try {
+          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
+              $scope.user = cacheService.getData("user");
+          } else {
+              $location.path("/login");
+          }
+      } catch (err) {
+          $location.path("/login");
+      }
+      $scope.$watch(function(){
+        console.log("Aaaaaaaaaaaaaa");
+          var bordercorrection = 0;
+          var tempbordercorrection = getComputedStyle(document.getElementById('cellshowsolutiondefects'),null).getPropertyValue('border-width').replace('px','');
+          if(!(isNaN(tempbordercorrection))) {
+              bordercorrection = parseInt(tempbordercorrection);
+          }
+          var newheight = window.innerHeight - $("#rating").outerHeight(true) - (bordercorrection * 2);
+          document.getElementById('comparison').style.height = newheight + 'px';
+          document.getElementById('showsolutiondefects').style.height = newheight + 'px';
+          document.getElementById('showanswereddefects').style.height = newheight + 'px';
+          console.log(window.innerHeight + " : " + $("#rating").outerHeight(true) + " : " + newheight);
+      }, true);
+      $scope.firstchar = 'a1';
+      var codetext = $('#showsolutiondefects').text();
+      var newcodetext = "";
+      for (i = 1; i <= codetext.length; i++) {
+          var tempchunk = '<smartchar id="a' + i + '">' + codetext[i-1] + '</smartchar>';
+          $scope.lastchar = 'a' + i;
+          newcodetext += tempchunk;
+      }
+      document.getElementById("showsolutiondefects").innerHTML = newcodetext;
+      document.getElementById("showanswereddefects").innerHTML = newcodetext;
+      $scope.clearDefects = function () {
+          marking.mark({target: 'showsolutiondefects', begin: $scope.firstchar, end: $scope.lastchar, color: ''});
+          marking.mark({target: 'showanswereddefects', begin: $scope.firstchar, end: $scope.lastchar, color: ''});
+      }
+      $scope.markDefects = function () { // green ok, yellow incomplete, red wrong on the right. maybe have colored solutions on the left (like meeting page)
+          $scope.clearDefects();
+          /*var i = 0;
+          while (i < defectList.get().length) {
+              var activemark = '0.2';
+              if (defectList.get()[i].active) {
+                  activemark = '0.5';
+              }
+              var markcolor = 'rgba(0, 255, 255, 0.3)';
+              if (defectList.get()[i].type == 0) {
+                  markcolor = 'rgba(255, 255, 0, ' + activemark + ')';
+              } else if (defectList.get()[i].type == 1) {
+                  markcolor = 'rgba(255, 0, 0, ' + activemark + ')';
+              }
+              marking.mark({target: 'code', begin: defectList.get()[i].begin, end: defectList.get()[i].end, color: markcolor});
+              i++;
+          }*/
+      }
+      $scope.markDefects();
+      $scope.resultValue = "100";
+      $scope.goToRanking = function () {
+          $location.path("/ranking/" + $routeParams.id);
+      }
+      $scope.goToHome = function () {
+          $location.path("/home");
+      }
+  }
 
   function meetingCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService, marking) {
       try {
@@ -421,108 +532,6 @@ var app = angular.module('revision', ['ngRoute'])
       $scope.getResults = function () {
         
       }
-  }
-
-  function waitingCtrl ($scope, $routeParams, $interval, $window, $location, cacheService, marking) {
-      try {
-          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
-              $scope.user = cacheService.getData("user");
-          } else {
-              $location.path("/login");
-          }
-      } catch (err) {
-          $location.path("/login");
-      }
-      $scope.gameID = $routeParams.id;
-      $scope.nextStep = $routeParams.nextstep;
-      $scope.goToNextStep = function () {
-          $location.path("/team/" + $scope.nextStep + "/" + $routeParams.id);
-      }
-  }
-
-  function resultCtrl ($scope, $routeParams, $interval, $window, $location, cacheService, marking) {
-      try {
-          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
-              $scope.user = cacheService.getData("user");
-          } else {
-              $location.path("/login");
-          }
-      } catch (err) {
-          $location.path("/login");
-      }
-      $scope.$watch(function(){
-        console.log("Aaaaaaaaaaaaaa");
-          var bordercorrection = 0;
-          var tempbordercorrection = getComputedStyle(document.getElementById('cellshowsolutiondefects'),null).getPropertyValue('border-width').replace('px','');
-          if(!(isNaN(tempbordercorrection))) {
-              bordercorrection = parseInt(tempbordercorrection);
-          }
-          var newheight = window.innerHeight - $("#rating").outerHeight(true) - (bordercorrection * 2);
-          document.getElementById('comparison').style.height = newheight + 'px';
-          document.getElementById('showsolutiondefects').style.height = newheight + 'px';
-          document.getElementById('showanswereddefects').style.height = newheight + 'px';
-          console.log(window.innerHeight + " : " + $("#rating").outerHeight(true) + " : " + newheight);
-      }, true);
-      $scope.firstchar = 'a1';
-      var codetext = $('#showsolutiondefects').text();
-      var newcodetext = "";
-      for (i = 1; i <= codetext.length; i++) {
-          var tempchunk = '<smartchar id="a' + i + '">' + codetext[i-1] + '</smartchar>';
-          $scope.lastchar = 'a' + i;
-          newcodetext += tempchunk;
-      }
-      document.getElementById("showsolutiondefects").innerHTML = newcodetext;
-      document.getElementById("showanswereddefects").innerHTML = newcodetext;
-      $scope.clearDefects = function () {
-          marking.mark({target: 'showsolutiondefects', begin: $scope.firstchar, end: $scope.lastchar, color: ''});
-          marking.mark({target: 'showanswereddefects', begin: $scope.firstchar, end: $scope.lastchar, color: ''});
-      }
-      $scope.markDefects = function () { // green ok, yellow incomplete, red wrong on the right. maybe have colored solutions on the left (like meeting page)
-          $scope.clearDefects();
-          /*var i = 0;
-          while (i < defectList.get().length) {
-              var activemark = '0.2';
-              if (defectList.get()[i].active) {
-                  activemark = '0.5';
-              }
-              var markcolor = 'rgba(0, 255, 255, 0.3)';
-              if (defectList.get()[i].type == 0) {
-                  markcolor = 'rgba(255, 255, 0, ' + activemark + ')';
-              } else if (defectList.get()[i].type == 1) {
-                  markcolor = 'rgba(255, 0, 0, ' + activemark + ')';
-              }
-              marking.mark({target: 'code', begin: defectList.get()[i].begin, end: defectList.get()[i].end, color: markcolor});
-              i++;
-          }*/
-      }
-      $scope.markDefects();
-      $scope.resultValue = "100";
-      $scope.goToRanking = function () {
-          $location.path("/ranking/" + $routeParams.id);
-      }
-      $scope.goToHome = function () {
-          $location.path("/home");
-      }
-  }
-
-  function rankingCtrl ($scope, $routeParams, $location, cacheService) {
-      try {
-          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
-              $scope.user = cacheService.getData("user");
-          } else {
-              $location.path("/login");
-          }
-      } catch (err) {
-          $location.path("/login");
-      }
-      $scope.gameID = $routeParams.id;
-      $scope.goToHome = function () {
-          $location.path("/home");
-      }
-      $scope.logout = function() {
-          cacheService.clearAll();
-          $location.path("/");
-      };
   }
 
   function gameCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService, marking, jaccardIndex) {
