@@ -21,7 +21,7 @@ var app = angular.module('revision', ['ngRoute'])
           controller: resultCtrl,
           templateUrl: 'templates/result.html'
       });
-      $routeProvider.when('/ranking/:id', {
+      $routeProvider.when('/:gamemode/ranking/:id', {
           controller: rankingCtrl,
           templateUrl: 'templates/ranking.html'
       });
@@ -180,24 +180,14 @@ var app = angular.module('revision', ['ngRoute'])
 
   function homeCtrl ($scope, $location, cacheService, $http) {
       try {
-          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
-              $scope.user = cacheService.getData("user");
+          if(cacheService.getData("userid") && (cacheService.getData("userid") != null) || (cacheService.getData("userid") != undefined)) {
+              $scope.myid = cacheService.getData("userid");
+              $scope.myname = cacheService.getData("nameuser");
           } else {
               $location.path("/login");
           }
       } catch (err) {
           $location.path("/login");
-      }
-      $scope.dump = function (obj) {
-          var out = '';
-          for (var i in obj) {
-              out += i + ": " + obj[i] + "\n";
-          }
-          alert(out);
-          // or, if you wanted to avoid alerts...
-          //var pre = document.createElement('pre');
-          //pre.innerHTML = out;
-          //document.body.appendChild(pre)
       }
       $scope.testConnection = function() {
           var req = {
@@ -219,10 +209,10 @@ var app = angular.module('revision', ['ngRoute'])
           $location.path("/team/game/" + id);
       };
       $scope.goToChallengeRanking = function(id) {
-          $location.path("/ranking/" + id);
+          $location.path("/challenge/ranking/" + id);
       };
       $scope.goToTeamRanking = function(id) {
-          $location.path("/ranking/" + id);
+          $location.path("/team/ranking/" + id);
       };
       $scope.logout = function() {
           cacheService.clearAll();
@@ -232,8 +222,9 @@ var app = angular.module('revision', ['ngRoute'])
 
   function waitingCtrl ($scope, $routeParams, $interval, $window, $location, cacheService, marking) {
       try {
-          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
-              $scope.user = cacheService.getData("user");
+          if(cacheService.getData("userid") && (cacheService.getData("userid") != null) || (cacheService.getData("userid") != undefined)) {
+              $scope.myid = cacheService.getData("userid");
+              $scope.myname = cacheService.getData("nameuser");
           } else {
               $location.path("/login");
           }
@@ -249,7 +240,7 @@ var app = angular.module('revision', ['ngRoute'])
 
   function loginCtrl ($scope, $location, cacheService, $http) {
       try {
-          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
+          if(cacheService.getData("userid") && (cacheService.getData("userid") != null) || (cacheService.getData("userid") != undefined)) {
               $location.path("/");
           }
       } catch (err) { }
@@ -261,15 +252,14 @@ var app = angular.module('revision', ['ngRoute'])
                   data: { username: $scope.username, pw: $scope.password}
               }
               $http(req).then(function(res) {
-                  var userinfo = res.data[0]; console.log(res.data);
-                  /*if (res.data >= 0) {
-                      $scope.error = "";
-                      cacheService.setData("userid", JSON.parse(userinfo.id));
-                      cacheService.setData("nameuser", JSON.parse(userinfo.username));
+                  var userinfo = res.data;
+                  if (userinfo.length > 0) {
+                      cacheService.setData("userid", userinfo[0].id);
+                      cacheService.setData("nameuser", userinfo[0].username);
                       $location.path("/");
                   } else {
                       $scope.error = "Wrong credentials";
-                  }*/
+                  }
               }, function(){
                   $scope.error = "Connection error";
               });
@@ -279,13 +269,17 @@ var app = angular.module('revision', ['ngRoute'])
 
   function rankingCtrl ($scope, $routeParams, $location, cacheService) {
       try {
-          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
-              $scope.user = cacheService.getData("user");
+          if(cacheService.getData("userid") && (cacheService.getData("userid") != null) || (cacheService.getData("userid") != undefined)) {
+              $scope.myid = cacheService.getData("userid");
+              $scope.myname = cacheService.getData("nameuser");
           } else {
               $location.path("/login");
           }
       } catch (err) {
           $location.path("/login");
+      }
+      if (!($routeParams.gamemode == "challenge" || $routeParams.gamemode == "team")) {
+          $location.path("/");
       }
       $scope.gameID = $routeParams.id;
       $scope.goToHome = function () {
@@ -299,13 +293,17 @@ var app = angular.module('revision', ['ngRoute'])
 
   function resultCtrl ($scope, $routeParams, $interval, $window, $location, cacheService, marking) {
       try {
-          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
-              $scope.user = cacheService.getData("user");
+          if(cacheService.getData("userid") && (cacheService.getData("userid") != null) || (cacheService.getData("userid") != undefined)) {
+              $scope.myid = cacheService.getData("userid");
+              $scope.myname = cacheService.getData("nameuser");
           } else {
               $location.path("/login");
           }
       } catch (err) {
           $location.path("/login");
+      }
+      if (!($routeParams.gamemode == "challenge" || $routeParams.gamemode == "team")) {
+          $location.path("/");
       }
       $scope.$watch(function(){
         console.log("Aaaaaaaaaaaaaa");
@@ -364,8 +362,9 @@ var app = angular.module('revision', ['ngRoute'])
 
   function meetingCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService, marking) {
       try {
-          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
-              $scope.user = cacheService.getData("user");
+          if(cacheService.getData("userid") && (cacheService.getData("userid") != null) || (cacheService.getData("userid") != undefined)) {
+              $scope.myid = cacheService.getData("userid");
+              $scope.myname = cacheService.getData("nameuser");
           } else {
               $location.path("/login");
           }
@@ -536,8 +535,9 @@ var app = angular.module('revision', ['ngRoute'])
 
   function gameCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService, marking, jaccardIndex) {
       try {
-          if(cacheService.getData("user") && (cacheService.getData("user") != null) || (cacheService.getData("user") != undefined)) {
-              $scope.user = cacheService.getData("user");
+          if(cacheService.getData("userid") && (cacheService.getData("userid") != null) || (cacheService.getData("userid") != undefined)) {
+              $scope.myid = cacheService.getData("userid");
+              $scope.myname = cacheService.getData("nameuser");
           } else {
               $location.path("/login");
           }
