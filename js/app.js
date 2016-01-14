@@ -32,8 +32,6 @@ var app = angular.module('revision', ['ngRoute'])
       $routeProvider.otherwise({
           redirectTo : '/home'
       });
-      //$httpProvider.defaults.useXDomain = true;
-      //delete $httpProvider.defaults.headers.common["X-Requested-With"];
   });
 
   app.filter('capitalize', function() {
@@ -44,13 +42,11 @@ var app = angular.module('revision', ['ngRoute'])
 
   app.factory('marking', function () {
       return {
-          mark: function(params) { //put target color in params
-              //console.log("directive");
+          mark: function(params) {
               var target = params['target'];
               var begin = parseInt(params['begin']);
               var end = parseInt(params['end']);
               var color = params['color'];
-              //console.log("changed: " + begin + " to " + end + " : " + color);
               if(end > begin) {
                   for (i = begin; i <= end; i++) {
                       document.getElementById(target).querySelector("#a"+i).style.backgroundColor = color;
@@ -113,10 +109,31 @@ var app = angular.module('revision', ['ngRoute'])
   app.factory("jaccardIndex", function (Defect) {
       return {
           common: function(a,b) {
-              return 32;
+              var low = -1;
+              var high = -1;
+              for (i = a.begin; i <= a.end; i++) {
+                  for (j = b.begin; j <= b.end; j++) {
+                      if (i == j) {
+                          if ((low == -1) || (i < low)) {
+                              low = i;
+                          }
+                          if ((high == -1) || (i > high)) {
+                              high = i;
+                          }
+                      }
+                  }
+              }
+              if ((low == -1) || (high == -1)) {
+                  return 0;
+              } else {
+                  return ((high - low) + 1);
+              }
+          },
+          union: function(a,b) {
+              return (((a.end - a.begin + 1) + (b.end - b.begin + 1)) - this.common(a,b));
           },
           calculate: function(a, b) {
-              return ((a.code.length + b.code.length - (2 * this.common(a,b))) / (a.code.length + b.code.length - this.common(a,b)));
+              return this.common(a,b) / this.union(a,b);
           }
       }
   });  
@@ -258,7 +275,7 @@ var app = angular.module('revision', ['ngRoute'])
                       cacheService.setData("nameuser", userinfo[0].username);
                       $location.path("/");
                   } else {
-                      $scope.error = "Wrong credentials";
+                      $scope.error = "Login error";
                   }
               }, function(){
                   $scope.error = "Connection error";
@@ -360,7 +377,7 @@ var app = angular.module('revision', ['ngRoute'])
       }
   }
 
-  function meetingCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService, marking) {
+  function meetingCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService, marking, jaccardIndex) {
       try {
           if(cacheService.getData("userid") && (cacheService.getData("userid") != null) || (cacheService.getData("userid") != undefined)) {
               $scope.myid = cacheService.getData("userid");
@@ -433,17 +450,17 @@ var app = angular.module('revision', ['ngRoute'])
       $scope.defects = defectList.get();
 
       // CENAS PARA TESTE
-      var newdefect = new Defect(0,'10','20',"batatas",'lol',$scope.user);
-      var newdefect2 = new Defect(1,'30','20',"batatas",'lol',$scope.user);
-      var newdefect3 = new Defect(0,'50','20',"batatas",'lol',$scope.user);
-      var newdefect4 = new Defect(1,'70','20',"batatas",'lol',$scope.user);
-      var newdefect5 = new Defect(0,'1','5',"batatas",'lol',$scope.user);
-      var newdefect6 = new Defect(1,'100','220',"batatas",'lol',$scope.user);
-      var newdefect7 = new Defect(1,'110','120',"batatas",'lol',$scope.user);
-      var newdefect8 = new Defect(0,'150','500',"batatas",'lol',$scope.user);
-      var newdefect9 = new Defect(1,'100','220',"batatas",'lol',$scope.user);
-      var newdefect10 = new Defect(1,'110','120',"batatas",'lol',$scope.user);
-      var newdefect11 = new Defect(0,'500','700',"batatas",'lol',$scope.user);
+      var newdefect = new Defect(0,'10','30',"batatas",'lol',$scope.myid);
+      var newdefect2 = new Defect(1,'50','60',"batatas",'lol',$scope.myid);
+      var newdefect3 = new Defect(0,'50','20',"batatas",'lol',$scope.myid);
+      var newdefect4 = new Defect(1,'70','20',"batatas",'lol',$scope.myid);
+      var newdefect5 = new Defect(0,'1','5',"batatas",'lol',$scope.myid);
+      var newdefect6 = new Defect(1,'100','220',"batatas",'lol',$scope.myid);
+      var newdefect7 = new Defect(1,'110','120',"batatas",'lol',$scope.myid);
+      var newdefect8 = new Defect(0,'150','500',"batatas",'lol',$scope.myid);
+      var newdefect9 = new Defect(1,'100','220',"batatas",'lol',$scope.myid);
+      var newdefect10 = new Defect(1,'110','120',"batatas",'lol',$scope.myid);
+      var newdefect11 = new Defect(0,'500','700',"batatas",'lol',$scope.myid);
       defectList.add(newdefect);
       defectList.add(newdefect2);
       defectList.add(newdefect3);
@@ -456,7 +473,9 @@ var app = angular.module('revision', ['ngRoute'])
       defectList.add(newdefect10);
       defectList.add(newdefect11);
       // CENAS PARA TESTE
-
+      //console.log(jaccardIndex.common(newdefect,newdefect2));
+      //console.log(jaccardIndex.union(newdefect,newdefect2));
+      //console.log(jaccardIndex.calculate(newdefect,newdefect2));
       $scope.clearDefects = function () {
           marking.mark({target: 'code', begin: $scope.firstchar, end: $scope.lastchar, color: ''});
       }
@@ -483,7 +502,7 @@ var app = angular.module('revision', ['ngRoute'])
       $scope.markDefects();
       $scope.jumpToDefect = function (defectID) {
           $scope.markDefects();
-          document.getElementById(defectList.getByID(defectID).begin).scrollIntoView();
+          document.getElementById('a' + defectList.getByID(defectID).begin).scrollIntoView();
       }
       $scope.toggleSelectionDefect = function (defectID) {
           defectList.toggleSelection(defectID);
@@ -578,6 +597,7 @@ var app = angular.module('revision', ['ngRoute'])
       $scope.gameDescription = gameSetup.load(2);
       $scope.wayOfTime = 0;
       $scope.ticking = true;
+      $scope.initialTime = 3600;
       if (true) { //check if countdown
           $scope.time = 3600;
           $scope.timeGoal = 0;
@@ -657,7 +677,7 @@ var app = angular.module('revision', ['ngRoute'])
                               var temp = stw.begin;
                               stw.begin = stw.end;
                               stw.end = temp;
-                          }
+                          } console.log($scope.defectType + " : " + stw.begin + " : " + stw.end + " : " + $scope.selectedType);
                           if (stw.end > parseInt($scope.lastchar.split('a')[1])) { stw.end = parseInt($scope.lastchar.split('a')[1]); }
                           var newdefect = new Defect($scope.defectType,stw.begin,stw.end,selectedText.text,$scope.selectedType,$scope.user);
                           defectList.add(newdefect);
@@ -700,7 +720,7 @@ var app = angular.module('revision', ['ngRoute'])
           }
           return wrapperElements;
       }
-      $scope.clearDefects = function () {
+      $scope.clearDefects = function () { console.log($scope.firstchar+":"+$scope.lastchar);
           marking.mark({target: 'code', begin: $scope.firstchar, end: $scope.lastchar, color: ''});
       }
       $scope.removeDefect = function (defectID) {
@@ -729,16 +749,61 @@ var app = angular.module('revision', ['ngRoute'])
       $scope.end = function () {
           $scope.wayOfTime = 0;
           $scope.ticking = false;
-          $scope.getResults();
+          $scope.sendResults();
           defectList.clearAll();
-          if($scope.gameMode == "challenge") {
+          $scope.defects = defectList.get();
+          /*if($scope.gameMode == "challenge") {
               $location.path("/" + $scope.gameMode + "/result/" + $scope.gameID); //perhaps use the solution atempt id here
           } else if($scope.gameMode == "team") {
               $location.path("/" + $scope.gameMode + "/meeting/wait/" + $scope.gameID); //perhaps use the solution atempt id here
-          }
+          }*/
       }
-      $scope.getResults = function () {
-
+      $scope.sendResults = function () {
+          var solutionDefects = [];
+          var foundDefects = [];
+          var incompleteDefects = [];
+          var correctDefects = [];
+          var newdefect0 = new Defect(0,'11','15',"batatas",'Erro1',$scope.user);
+          var newdefect1 = new Defect(1,'1','10',"batatas",'Erro2',$scope.user);
+          solutionDefects.push(newdefect0);
+          solutionDefects.push(newdefect1);
+          var timebonus = (solutionDefects.length * 2) * 0.25;
+          var perfectscore = (solutionDefects.length * 2) + timebonus;
+          var currentscore = 0;
+          for (var i = 0; i < solutionDefects.length; i++) {
+              var matchedID = null;
+              var matchedPoints = -1;
+              for (var j = 0; j < defectList.get().length; j++) {
+                  var tempindex = jaccardIndex.calculate(solutionDefects[i],defectList.get()[j]);
+                  if (tempindex > 0 && tempindex > matchedPoints) {
+                      matchedID = defectList.get()[j].id;
+                      if (solutionDefects[i].type == defectList.get()[j].type) {
+                          tempindex += 0.5;
+                      }
+                      if (solutionDefects[i].description == defectList.get()[j].description) {
+                          tempindex += 0.5;
+                      }
+                      matchedPoints = tempindex;
+                  }
+              }
+              if (matchedID != null) {
+                  foundDefects.push(solutionDefects[i]);
+                  solutionDefects.splice(i, 1);
+                  if (matchedPoints == 2) {
+                      correctDefects.push(defectList.getByID(matchedID));
+                  } else {
+                      incompleteDefects.push(defectList.getByID(matchedID));
+                  }
+                  defectList.remove(matchedID);
+                  currentscore += matchedPoints;
+                  i--;
+              }
+          }
+          var percRemainingTime = $scope.time / $scope.initialTime;
+          if (percRemainingTime <= 0.5) {
+              timebonus = timebonus * percRemainingTime * 2;
+          }
+          var finalscore = (currentscore + timebonus) / perfectscore; console.log(finalscore + " = " + currentscore + " + " + timebonus + " / " + perfectscore);
       }
       $scope.hoverRemoveButton = function (defectID) {
           $("#"+defectID).find("#removedefectcell").css("background-color", "white");
