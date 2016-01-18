@@ -200,6 +200,7 @@ var app = angular.module('revision', ['ngRoute'])
           if(cacheService.getData("userid") && (cacheService.getData("userid") != null) || (cacheService.getData("userid") != undefined)) {
               $scope.myid = cacheService.getData("userid");
               $scope.myname = cacheService.getData("nameuser");
+              $scope.myteam = cacheService.getData("team");
           } else {
               $location.path("/login");
           }
@@ -242,6 +243,7 @@ var app = angular.module('revision', ['ngRoute'])
           if(cacheService.getData("userid") && (cacheService.getData("userid") != null) || (cacheService.getData("userid") != undefined)) {
               $scope.myid = cacheService.getData("userid");
               $scope.myname = cacheService.getData("nameuser");
+              $scope.myteam = cacheService.getData("team");
           } else {
               $location.path("/login");
           }
@@ -273,6 +275,22 @@ var app = angular.module('revision', ['ngRoute'])
                   if (userinfo.length > 0) {
                       cacheService.setData("userid", userinfo[0].id);
                       cacheService.setData("nameuser", userinfo[0].username);
+                      var myteam = 0;
+                      switch(userinfo[0].id) {
+                          case 1: myteam = 1;
+                            break;
+                          case 2: myteam = 2;
+                            break;
+                          case 3: myteam = 1;
+                            break;
+                          case 4: myteam = 2;
+                            break;
+                          case 5: myteam = 3;
+                            break;
+                          case 6: myteam = 3;
+                            break;
+                      }
+                      cacheService.setData("team", myteam);
                       $location.path("/");
                   } else {
                       $scope.error = "Login error";
@@ -284,11 +302,12 @@ var app = angular.module('revision', ['ngRoute'])
       }
   } 
 
-  function rankingCtrl ($scope, $routeParams, $location, cacheService) {
+  function rankingCtrl ($scope, $routeParams, $location, $http, cacheService) {
       try {
           if(cacheService.getData("userid") && (cacheService.getData("userid") != null) || (cacheService.getData("userid") != undefined)) {
               $scope.myid = cacheService.getData("userid");
               $scope.myname = cacheService.getData("nameuser");
+              $scope.myteam = cacheService.getData("team");
           } else {
               $location.path("/login");
           }
@@ -299,6 +318,35 @@ var app = angular.module('revision', ['ngRoute'])
           $location.path("/");
       }
       $scope.gameID = $routeParams.id;
+      $scope.getResults = function () {
+          var ranking = [];
+          var req = {
+              method: 'GET',
+              url: 'http://revision-jpguimaraes.rhcloud.com/getteamranking'
+          }
+          $http(req).then(function(res) {
+              var userinfo = res.data;
+              if (userinfo.length > 0) {
+                  for (var i = 0; i < userinfo.length; i++) {
+                      var tempposision = [];
+                      tempposision.id_team = userinfo[i].id_team;
+                      tempposision.hits = userinfo[i].hits;
+                      tempposision.misses = userinfo[i].misses;
+                      tempposision.incomplete = userinfo[i].incomplete;
+                      tempposision.wrong = userinfo[i].wrong;
+                      tempposision.seconds = userinfo[i].seconds;
+                      tempposision.classification = userinfo[i].classification;
+                      ranking.push(tempposision);
+                  }
+              } else {
+                  return "error";
+              }
+          }, function(){
+              return "error";
+          });
+          return ranking;
+      }
+      $scope.results = $scope.getResults();
       $scope.goToHome = function () {
           $location.path("/home");
       }
@@ -308,11 +356,12 @@ var app = angular.module('revision', ['ngRoute'])
       };
   } 
 
-  function resultCtrl ($scope, $routeParams, $interval, $window, $location, cacheService, marking) {
+  function resultCtrl ($scope, $routeParams, $interval, $window, $http, $location, cacheService, marking) {
       try {
           if(cacheService.getData("userid") && (cacheService.getData("userid") != null) || (cacheService.getData("userid") != undefined)) {
               $scope.myid = cacheService.getData("userid");
               $scope.myname = cacheService.getData("nameuser");
+              $scope.myteam = cacheService.getData("team");
           } else {
               $location.path("/login");
           }
@@ -323,7 +372,6 @@ var app = angular.module('revision', ['ngRoute'])
           $location.path("/");
       }
       $scope.$watch(function(){
-        console.log("Aaaaaaaaaaaaaa");
           var bordercorrection = 0;
           var tempbordercorrection = getComputedStyle(document.getElementById('cellshowsolutiondefects'),null).getPropertyValue('border-width').replace('px','');
           if(!(isNaN(tempbordercorrection))) {
@@ -368,7 +416,24 @@ var app = angular.module('revision', ['ngRoute'])
           }*/
       }
       $scope.markDefects();
-      $scope.resultValue = "100";
+      $scope.getRating = function () {
+          var req = {
+              method: 'POST',
+              url: 'http://revision-jpguimaraes.rhcloud.com/getteamresult',
+              data: { attempt: $scope.myteam}
+          }
+          $http(req).then(function(res) {
+              var userinfo = res.data;
+              if (userinfo.length > 0) {
+                  return userinfo[0].classification;
+              } else {
+                  return "error";
+              }
+          }, function(){
+              return "error";
+          });
+      }
+      $scope.resultValue = $scope.getRating();
       $scope.goToRanking = function () {
           $location.path("/ranking/" + $routeParams.id);
       }
@@ -382,6 +447,7 @@ var app = angular.module('revision', ['ngRoute'])
           if(cacheService.getData("userid") && (cacheService.getData("userid") != null) || (cacheService.getData("userid") != undefined)) {
               $scope.myid = cacheService.getData("userid");
               $scope.myname = cacheService.getData("nameuser");
+              $scope.myteam = cacheService.getData("team");
           } else {
               $location.path("/login");
           }
@@ -449,30 +515,29 @@ var app = angular.module('revision', ['ngRoute'])
       $interval($scope.timer, 1000);
       $scope.defects = defectList.get();
 
-      // CENAS PARA TESTE
-      var newdefect = new Defect(0,'10','30',"batatas",'lol',$scope.myid);
-      var newdefect2 = new Defect(1,'50','60',"batatas",'lol',$scope.myid);
-      var newdefect3 = new Defect(0,'50','20',"batatas",'lol',$scope.myid);
-      var newdefect4 = new Defect(1,'70','20',"batatas",'lol',$scope.myid);
-      var newdefect5 = new Defect(0,'1','5',"batatas",'lol',$scope.myid);
-      var newdefect6 = new Defect(1,'100','220',"batatas",'lol',$scope.myid);
-      var newdefect7 = new Defect(1,'110','120',"batatas",'lol',$scope.myid);
-      var newdefect8 = new Defect(0,'150','500',"batatas",'lol',$scope.myid);
-      var newdefect9 = new Defect(1,'100','220',"batatas",'lol',$scope.myid);
-      var newdefect10 = new Defect(1,'110','120',"batatas",'lol',$scope.myid);
-      var newdefect11 = new Defect(0,'500','700',"batatas",'lol',$scope.myid);
-      defectList.add(newdefect);
-      defectList.add(newdefect2);
-      defectList.add(newdefect3);
-      defectList.add(newdefect4);
-      defectList.add(newdefect5);
-      defectList.add(newdefect6);
-      defectList.add(newdefect7);
-      defectList.add(newdefect8);
-      defectList.add(newdefect9);
-      defectList.add(newdefect10);
-      defectList.add(newdefect11);
-      // CENAS PARA TESTE
+      $scope.updateDefects = function () {
+          defectList.clearAll();
+          var req = {
+                  method: 'POST',
+                  url: 'http://revision-jpguimaraes.rhcloud.com/getdefectsmulti',
+                  data: { attempt: $scope.myteam}
+          }
+          $http(req).then(function(res) {
+              var userinfo = res.data;
+              if (userinfo.length > 0) {
+                  for (var i = 0; i < userinfo.length; i++) {
+                      var newdefect = new Defect(userinfo[i].defecttype,userinfo[i].dbegin,userinfo[i].dend,"",userinfo[i].description,$scope.myid);
+                      defectList.add(newdefect);
+                  }
+                  console.log("loaded");
+              } else {
+                  console.log("no defects");
+              }
+          }, function(){
+              console.log("Connection error");
+          });
+      }
+      $interval($scope.updateDefects, 5000);
       //console.log(jaccardIndex.common(newdefect,newdefect2));
       //console.log(jaccardIndex.union(newdefect,newdefect2));
       //console.log(jaccardIndex.calculate(newdefect,newdefect2));
@@ -545,18 +610,89 @@ var app = angular.module('revision', ['ngRoute'])
           $scope.wayOfTime = 0;
           $scope.ticking = false;
           if($scope.captain) {
-            $scope.getResults();
+            $scope.calculateResults();
           }
-          defectList.clearAll();
-          //$location.path("/" + $scope.gameMode + "/result/wait/" + $scope.gameID); //perhaps use the solution atempt id here
+          //defectList.clearAll();
+          $location.path("/" + $scope.gameMode + "/result/wait/" + $scope.gameID); //perhaps use the solution atempt id here
       } 
-      $scope.getResults = function () {
+      $scope.calculateResults = function () {
           for(i = 0; i < defectList.get().length; i++) {
               if(!defectList.get()[i].active) {
                   defectList.remove(defectList.get()[i].id);
                   i--;
               }
           }
+          var solutionDefects = [];
+          var foundDefects = [];
+          var incompleteDefects = [];
+          var correctDefects = [];
+          var newdefect0 = new Defect(0,'39','274',"",'Documentation',$scope.user);
+          var newdefect1 = new Defect(0,'375','388',"",'Assignment/Initialization',$scope.user);
+          var newdefect1 = new Defect(0,'919','923',"",'Checking',$scope.user);
+          var newdefect1 = new Defect(0,'1144','1148',"",'Checking',$scope.user);
+          var newdefect1 = new Defect(0,'1319','1319',"",'Assignment/Initialization',$scope.user);
+          var newdefect1 = new Defect(0,'1400','1400',"",'Assignment/Initialization',$scope.user);
+          var newdefect1 = new Defect(0,'1400','1400',"",'Assignment/Initialization',$scope.user);
+          var newdefect1 = new Defect(0,'1574','1575',"",'Assignment/Initialization',$scope.user);
+          var newdefect1 = new Defect(0,'1615','1655',"",'Checking',$scope.user);
+          var newdefect1 = new Defect(0,'1721','1721',"",'Algorythm',$scope.user);
+          var newdefect1 = new Defect(0,'1759','1833',"",'Documentation',$scope.user);
+          solutionDefects.push(newdefect0);
+          solutionDefects.push(newdefect1);
+          var timebonus = (solutionDefects.length * 2) * 0.25;
+          var perfectscore = (solutionDefects.length * 2) + timebonus;
+          var currentscore = 0;
+          for (var i = 0; i < solutionDefects.length; i++) {
+              var matchedID = null;
+              var matchedPoints = -1;
+              for (var j = 0; j < defectList.get().length; j++) {
+                  var tempindex = jaccardIndex.calculate(solutionDefects[i],defectList.get()[j]);
+                  if (tempindex > 0 && tempindex > matchedPoints) {
+                      matchedID = defectList.get()[j].id;
+                      if (solutionDefects[i].type == defectList.get()[j].type) {
+                          tempindex += 0.5;
+                      }
+                      if (solutionDefects[i].description == defectList.get()[j].description) {
+                          tempindex += 0.5;
+                      }
+                      matchedPoints = tempindex;
+                  }
+              }
+              if (matchedID != null) {
+                  foundDefects.push(solutionDefects[i]);
+                  solutionDefects.splice(i, 1);
+                  if (matchedPoints == 2) {
+                      correctDefects.push(defectList.getByID(matchedID));
+                  } else {
+                      incompleteDefects.push(defectList.getByID(matchedID));
+                  }
+                  defectList.remove(matchedID);
+                  currentscore += matchedPoints;
+                  i--;
+              }
+          }
+          var percRemainingTime = $scope.time / $scope.initialTime;
+          var timespent = $scope.initialTime - $scope.time;
+          if (percRemainingTime <= 0.5) {
+              timebonus = timebonus * percRemainingTime * 2;
+          }
+          var finalscore = (currentscore + timebonus) / perfectscore; console.log(finalscore + " = " + currentscore + " + " + timebonus + " / " + perfectscore);
+          finalscore = finalscore * 100;
+          var req = {
+                  method: 'POST',
+                  url: 'http://revision-jpguimaraes.rhcloud.com/submitresults',
+                  data: { team: $scope.myteam, classification: finalscore, seconds: timespent, hits: correctDefects.lentgh, missed: solutionDefects.length, incompleted: incompleteDefects.length, wrong: defectList.length}
+          }
+          $http(req).then(function(res) {
+              var userinfo = res.data;
+              if (userinfo.length > 0) {
+                  console.log("submited");
+              } else {
+                  console.log("no defects");
+              }
+          }, function(){
+              console.log("Connection error");
+          });
       }
   }
 
@@ -565,6 +701,7 @@ var app = angular.module('revision', ['ngRoute'])
           if(cacheService.getData("userid") && (cacheService.getData("userid") != null) || (cacheService.getData("userid") != undefined)) {
               $scope.myid = cacheService.getData("userid");
               $scope.myname = cacheService.getData("nameuser");
+              $scope.myteam = cacheService.getData("team");
           } else {
               $location.path("/login");
           }
@@ -597,14 +734,14 @@ var app = angular.module('revision', ['ngRoute'])
       $scope.gameDescription = gameSetup.load(2);
       $scope.wayOfTime = 0;
       $scope.ticking = true;
-      $scope.initialTime = 3600;
+      $scope.initialTime = 1800;
       if (true) { //check if countdown
-          $scope.time = 3600;
+          $scope.time = 1800;
           $scope.timeGoal = 0;
           $scope.wayOfTime = -1;
       } else {
           $scope.time = 0;
-          $scope.timeGoal = 3600;
+          $scope.timeGoal = 1800;
           $scope.wayOfTime = 1;
       }
       $scope.setClock = function () {
@@ -746,64 +883,39 @@ var app = angular.module('revision', ['ngRoute'])
               $scope.end();
           }
       }
+      $scope.sendResults = function () {
+          var chosendefects = defectList.get();
+          var itsok = true;
+          for (var i = 0; i < chosendefects.length; i++) {
+              console.log("Sending defect " + chosendefects[i].id);
+              var req = {
+                  method: 'POST',
+                  url: 'http://revision-jpguimaraes.rhcloud.com/adddefect',
+                  data: { attempt: $scope.myteam, defecttype: chosendefects[i].type, description: chosendefects[i].description, dbegin: chosendefects[i].begin, dend: chosendefects[i].end }
+              }
+              $http(req).then(function(res) {
+                  itsok = true;
+              }, function(){
+                  itsok = false;
+              });
+          }
+          return itsok;
+      }
       $scope.end = function () {
           $scope.wayOfTime = 0;
           $scope.ticking = false;
-          $scope.sendResults();
-          defectList.clearAll();
-          $scope.defects = defectList.get();
-          /*if($scope.gameMode == "challenge") {
+          //$scope.sendResults();
+          //defectList.clearAll();
+          //$scope.defects = defectList.get();
+          if($scope.gameMode == "challenge") {
               $location.path("/" + $scope.gameMode + "/result/" + $scope.gameID); //perhaps use the solution atempt id here
           } else if($scope.gameMode == "team") {
+              var sent = false;
+              do {
+                  sent = $scope.sendResults();
+              } while (sent != true);
               $location.path("/" + $scope.gameMode + "/meeting/wait/" + $scope.gameID); //perhaps use the solution atempt id here
-          }*/
-      }
-      $scope.sendResults = function () {
-          var solutionDefects = [];
-          var foundDefects = [];
-          var incompleteDefects = [];
-          var correctDefects = [];
-          var newdefect0 = new Defect(0,'11','15',"batatas",'Erro1',$scope.user);
-          var newdefect1 = new Defect(1,'1','10',"batatas",'Erro2',$scope.user);
-          solutionDefects.push(newdefect0);
-          solutionDefects.push(newdefect1);
-          var timebonus = (solutionDefects.length * 2) * 0.25;
-          var perfectscore = (solutionDefects.length * 2) + timebonus;
-          var currentscore = 0;
-          for (var i = 0; i < solutionDefects.length; i++) {
-              var matchedID = null;
-              var matchedPoints = -1;
-              for (var j = 0; j < defectList.get().length; j++) {
-                  var tempindex = jaccardIndex.calculate(solutionDefects[i],defectList.get()[j]);
-                  if (tempindex > 0 && tempindex > matchedPoints) {
-                      matchedID = defectList.get()[j].id;
-                      if (solutionDefects[i].type == defectList.get()[j].type) {
-                          tempindex += 0.5;
-                      }
-                      if (solutionDefects[i].description == defectList.get()[j].description) {
-                          tempindex += 0.5;
-                      }
-                      matchedPoints = tempindex;
-                  }
-              }
-              if (matchedID != null) {
-                  foundDefects.push(solutionDefects[i]);
-                  solutionDefects.splice(i, 1);
-                  if (matchedPoints == 2) {
-                      correctDefects.push(defectList.getByID(matchedID));
-                  } else {
-                      incompleteDefects.push(defectList.getByID(matchedID));
-                  }
-                  defectList.remove(matchedID);
-                  currentscore += matchedPoints;
-                  i--;
-              }
           }
-          var percRemainingTime = $scope.time / $scope.initialTime;
-          if (percRemainingTime <= 0.5) {
-              timebonus = timebonus * percRemainingTime * 2;
-          }
-          var finalscore = (currentscore + timebonus) / perfectscore; console.log(finalscore + " = " + currentscore + " + " + timebonus + " / " + perfectscore);
       }
       $scope.hoverRemoveButton = function (defectID) {
           $("#"+defectID).find("#removedefectcell").css("background-color", "white");
