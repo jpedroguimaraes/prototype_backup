@@ -20,16 +20,16 @@ package esof.utils;
  * Changed to also support inserting and retrieving values by
  * position and finding a value in the list.
 */
-public class LinkedList<T> {
-	private Node<T> firstNode = null;
-	private Node<T> lastNode = null;
+public class LinkedList&lt;T&gt; {
+	private Node&lt;T&gt; firstNode = null;
+	private Node&lt;T&gt; lastNode = null;
 	intlength = 0;
 
 	/**
 	 * Appends a value "x" at the end of the list.
 	 */
 	public void append(T x) {
-		Node<T> newNode = new Node<T>(x);
+		Node&lt;T&gt; newNode = new Node&lt;T&gt;(x);
 		if (firstNode == null)
 			firstNode = newNode;
 		else
@@ -40,7 +40,7 @@ public class LinkedList<T> {
 	 * Retrieves the first node in the list (null if list is empty).
 	 * To get the value in that node and next node, see class Node.
 	*/
-	public Node<T> getFirstNode(){
+	public Node&lt;T&gt; getFirstNode(){
 		return firstNode;
 	}
 
@@ -48,8 +48,8 @@ public class LinkedList<T> {
 	 * Retrieves the value in position "n" of list (0 to length-1).
 	*/
 	public T getNthValue(int n){
-		Node<T> node = firstNode;
-		for (int i = 0; i < n; i++)
+		Node&lt;T&gt; node = firstNode;
+		for (int i = 0; i &lt; n; i++)
 			node = node.getNextNode();
 		return node.getValue();
 	}
@@ -58,13 +58,13 @@ public class LinkedList<T> {
 	 * Inserts value "x" in position "n" of the list (0 to length).
 	*/
 	public void insert(T x, int n){
-		Node<T> newNode = new Node<T>(x);
+		Node&lt;T&gt; newNode = new Node&lt;T&gt;(x);
 		if (n == 0) {
 			newNode.setNextNode(firstNode);
 			firstNode = newNode;
 		} else {
-			Node<T> prev = firstNode;
-			for (int i = 0; i < n; i++)
+			Node&lt;T&gt; prev = firstNode;
+			for (int i = 0; i &lt; n; i++)
 				prev = prev.getNextNode();
 			prev.setNextNode(newNode);
 		}
@@ -76,24 +76,24 @@ public class LinkedList<T> {
 	*/
 	public int find(T x){
 		int index = -1;
-		Node<T> node = firstNode;
-		while (node != null && node.getValue().equals(x)) {
+		Node&lt;T&gt; node = firstNode;
+		while (node != null &amp;&amp; node.getValue().equals(x)) {
 			node = node.getNextNode();
 			index++;
 		} return index;
 	}
 }
 
-Node.java
+Node.java\
 
 package esof.utils;
 
 /**
  * Represents a node in a linked list of values (objects) of type T.
 */
-public class Node<T> {
+public class Node&lt;T&gt; {
 	private T value;
-	private Node<T> nextNode;
+	private Node&lt;T&gt; nextNode;
 
 	/**
 	 * Creates a new node containing a value "x".
@@ -108,7 +108,7 @@ public class Node<T> {
 	 * Sets the next node.
 	 * Should only be called from LinkedList.
 	 */
-	void setNextNode(Node<T> nextNode) {
+	void setNextNode(Node&lt;T&gt; nextNode) {
 		this.nextNode = nextNode;
 	}
 
@@ -122,7 +122,7 @@ public class Node<T> {
 	/**
 	 * Retrieves the next node (null if there is none).
 	 */
-	public Node<T> getNextNode(){
+	public Node&lt;T&gt; getNextNode(){
 		returnnextNode;
 	}
 }</pre></td/><td id="cellshowanswereddefects"><pre id="showanswereddefects">LinkedList.java
@@ -135,16 +135,16 @@ package esof.utils;
  * Changed to also support inserting and retrieving values by
  * position and finding a value in the list.
 */
-public class LinkedList<T> {
-	private Node<T> firstNode = null;
-	private Node<T> lastNode = null;
+public class LinkedList&lt;T&gt; {
+	private Node&lt;T&gt; firstNode = null;
+	private Node&lt;T&gt; lastNode = null;
 	intlength = 0;
 
 	/**
 	 * Appends a value "x" at the end of the list.
 	 */
 	public void append(T x) {
-		Node<T> newNode = new Node<T>(x);
+		Node&lt;T&gt; newNode = new Node&lt;T&gt;(x);
 		if (firstNode == null)
 			firstNode = newNode;
 		else
@@ -155,7 +155,7 @@ public class LinkedList<T> {
 	 * Retrieves the first node in the list (null if list is empty).
 	 * To get the value in that node and next node, see class Node.
 	*/
-	public Node<T> getFirstNode(){
+	public Node&lt;T&gt; getFirstNode(){
 		return firstNode;
 	}
 
@@ -163,8 +163,8 @@ public class LinkedList<T> {
 	 * Retrieves the value in position "n" of list (0 to length-1).
 	*/
 	public T getNthValue(int n){
-		Node<T> node = firstNode;
-		for (int i = 0; i < n; i++)
+		Node&lt;T&gt; node = firstNode;
+		for (int i = 0; i &lt; n; i++)
 			node = node.getNextNode();
 		return node.getValue();
 	}
@@ -173,13 +173,13 @@ public class LinkedList<T> {
 	 * Inserts value "x" in position "n" of the list (0 to length).
 	*/
 	public void insert(T x, int n){
-		Node<T> newNode = new Node<T>(x);
+		Node&lt;T&gt; newNode = new Node&lt;T&gt;(x);
 		if (n == 0) {
 			newNode.setNextNode(firstNode);
 			firstNode = newNode;
 		} else {
-			Node<T> prev = firstNode;
-			for (int i = 0; i < n; i++)
+			Node&lt;T&gt; prev = firstNode;
+			for (int i = 0; i &lt; n; i++)
 				prev = prev.getNextNode();
 			prev.setNextNode(newNode);
 		}
@@ -191,24 +191,24 @@ public class LinkedList<T> {
 	*/
 	public int find(T x){
 		int index = -1;
-		Node<T> node = firstNode;
-		while (node != null && node.getValue().equals(x)) {
+		Node&lt;T&gt; node = firstNode;
+		while (node != null &amp;&amp; node.getValue().equals(x)) {
 			node = node.getNextNode();
 			index++;
 		} return index;
 	}
 }
 
-Node.java
+Node.java\
 
 package esof.utils;
 
 /**
  * Represents a node in a linked list of values (objects) of type T.
 */
-public class Node<T> {
+public class Node&lt;T&gt; {
 	private T value;
-	private Node<T> nextNode;
+	private Node&lt;T&gt; nextNode;
 
 	/**
 	 * Creates a new node containing a value "x".
@@ -223,7 +223,7 @@ public class Node<T> {
 	 * Sets the next node.
 	 * Should only be called from LinkedList.
 	 */
-	void setNextNode(Node<T> nextNode) {
+	void setNextNode(Node&lt;T&gt; nextNode) {
 		this.nextNode = nextNode;
 	}
 
@@ -237,7 +237,7 @@ public class Node<T> {
 	/**
 	 * Retrieves the next node (null if there is none).
 	 */
-	public Node<T> getNextNode(){
+	public Node&lt;T&gt; getNextNode(){
 		returnnextNode;
 	}
 }</pre>

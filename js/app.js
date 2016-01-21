@@ -356,7 +356,7 @@ var app = angular.module('revision', ['ngRoute'])
       };
   } 
 
-  function resultCtrl ($scope, $routeParams, $interval, $window, $http, $location, cacheService, marking) {
+  function resultCtrl ($scope, $routeParams, $interval, $window, $http, $location, cacheService, marking, defectList, Defect) {
       try {
           if(cacheService.getData("userid") && (cacheService.getData("userid") != null) || (cacheService.getData("userid") != undefined)) {
               $scope.myid = cacheService.getData("userid");
@@ -391,14 +391,52 @@ var app = angular.module('revision', ['ngRoute'])
           $scope.lastchar = 'a' + i;
           newcodetext += tempchunk;
       }
+      console.log($scope.firstchar + " : " + $scope.lastchar);
       document.getElementById("showsolutiondefects").innerHTML = newcodetext;
       document.getElementById("showanswereddefects").innerHTML = newcodetext;
       $scope.clearDefects = function () {
           marking.mark({target: 'showsolutiondefects', begin: $scope.firstchar, end: $scope.lastchar, color: ''});
           marking.mark({target: 'showanswereddefects', begin: $scope.firstchar, end: $scope.lastchar, color: ''});
       }
+      $scope.clearDefects();
+      $scope.loadSolution = function () {
+          var solutionDefects = []; 
+          var newdefect0 = new Defect(0,'39','274',"",'Documentation',$scope.user);
+          var newdefect1 = new Defect(0,'375','388',"",'Assignment/Initialization',$scope.user);
+          var newdefect2 = new Defect(0,'919','923',"",'Checking',$scope.user);
+          var newdefect3 = new Defect(0,'1144','1148',"",'Checking',$scope.user);
+          var newdefect4 = new Defect(0,'1319','1319',"",'Assignment/Initialization',$scope.user);
+          var newdefect5 = new Defect(0,'1400','1400',"",'Assignment/Initialization',$scope.user);
+          var newdefect6 = new Defect(0,'1400','1400',"",'Assignment/Initialization',$scope.user);
+          var newdefect7 = new Defect(0,'1574','1575',"",'Assignment/Initialization',$scope.user);
+          var newdefect8 = new Defect(0,'1615','1655',"",'Checking',$scope.user);
+          var newdefect9 = new Defect(0,'1721','1721',"",'Algorythm',$scope.user);
+          var newdefect10 = new Defect(0,'1759','1833',"",'Documentation',$scope.user);
+          solutionDefects.push(newdefect0);
+          solutionDefects.push(newdefect1);
+          solutionDefects.push(newdefect2);
+          solutionDefects.push(newdefect3);
+          solutionDefects.push(newdefect4);
+          solutionDefects.push(newdefect5);
+          solutionDefects.push(newdefect6);
+          solutionDefects.push(newdefect7);
+          solutionDefects.push(newdefect8);
+          solutionDefects.push(newdefect9);
+          solutionDefects.push(newdefect10);
+          var i = 0;
+          while (i < solutionDefects.length) {
+              var markcolor = 'rgba(0, 255, 255, 0.3)';
+              if (solutionDefects[i].type == 0) {
+                  markcolor = 'rgba(255, 255, 0, 0.5)';
+              } else if (solutionDefects[i].type == 1) {
+                  markcolor = 'rgba(255, 0, 0, 0.5)';
+              }
+              marking.mark({target: 'showsolutiondefects', begin: solutionDefects[i].begin, end: solutionDefects[i].end, color: markcolor});
+              i++;
+          }
+      }
+      $scope.loadSolution();
       $scope.markDefects = function () { // green ok, yellow incomplete, red wrong on the right. maybe have colored solutions on the left (like meeting page)
-          $scope.clearDefects();
           /*var i = 0;
           while (i < defectList.get().length) {
               var activemark = '0.2';
@@ -620,17 +658,26 @@ var app = angular.module('revision', ['ngRoute'])
           var correctDefects = [];
           var newdefect0 = new Defect(0,'39','274',"",'Documentation',$scope.user);
           var newdefect1 = new Defect(0,'375','388',"",'Assignment/Initialization',$scope.user);
-          var newdefect1 = new Defect(0,'919','923',"",'Checking',$scope.user);
-          var newdefect1 = new Defect(0,'1144','1148',"",'Checking',$scope.user);
-          var newdefect1 = new Defect(0,'1319','1319',"",'Assignment/Initialization',$scope.user);
-          var newdefect1 = new Defect(0,'1400','1400',"",'Assignment/Initialization',$scope.user);
-          var newdefect1 = new Defect(0,'1400','1400',"",'Assignment/Initialization',$scope.user);
-          var newdefect1 = new Defect(0,'1574','1575',"",'Assignment/Initialization',$scope.user);
-          var newdefect1 = new Defect(0,'1615','1655',"",'Checking',$scope.user);
-          var newdefect1 = new Defect(0,'1721','1721',"",'Algorythm',$scope.user);
-          var newdefect1 = new Defect(0,'1759','1833',"",'Documentation',$scope.user);
+          var newdefect2 = new Defect(0,'919','923',"",'Checking',$scope.user);
+          var newdefect3 = new Defect(0,'1144','1148',"",'Checking',$scope.user);
+          var newdefect4 = new Defect(0,'1319','1319',"",'Assignment/Initialization',$scope.user);
+          var newdefect5 = new Defect(0,'1400','1400',"",'Assignment/Initialization',$scope.user);
+          var newdefect6 = new Defect(0,'1400','1400',"",'Assignment/Initialization',$scope.user);
+          var newdefect7 = new Defect(0,'1574','1575',"",'Assignment/Initialization',$scope.user);
+          var newdefect8 = new Defect(0,'1615','1655',"",'Checking',$scope.user);
+          var newdefect9 = new Defect(0,'1721','1721',"",'Algorythm',$scope.user);
+          var newdefect10 = new Defect(0,'1759','1833',"",'Documentation',$scope.user);
           solutionDefects.push(newdefect0);
           solutionDefects.push(newdefect1);
+          solutionDefects.push(newdefect2);
+          solutionDefects.push(newdefect3);
+          solutionDefects.push(newdefect4);
+          solutionDefects.push(newdefect5);
+          solutionDefects.push(newdefect6);
+          solutionDefects.push(newdefect7);
+          solutionDefects.push(newdefect8);
+          solutionDefects.push(newdefect9);
+          solutionDefects.push(newdefect10);
           var timebonus = (solutionDefects.length * 2) * 0.25;
           var perfectscore = (solutionDefects.length * 2) + timebonus;
           var currentscore = 0;
@@ -884,23 +931,26 @@ var app = angular.module('revision', ['ngRoute'])
               $scope.end();
           }
       }
-      $scope.sendResults = function () {
-          var chosendefects = defectList.get();
-          var itsok = true;
-          for (var i = 0; i < chosendefects.length; i++) {
-              console.log("Sending defect " + chosendefects[i].id);
+      $scope.sending = function (chosendefects) {
+          if (chosendefects.length > 0) {
+              console.log("Sending defect " + chosendefects[0].id);
               var req = {
                   method: 'POST',
                   url: 'http://revision-jpguimaraes.rhcloud.com/adddefect',
-                  data: { attempt: $scope.myteam, defecttype: chosendefects[i].type, description: chosendefects[i].description, dbegin: chosendefects[i].begin, dend: chosendefects[i].end }
+                  data: { attempt: $scope.myteam, defecttype: chosendefects[0].type, description: chosendefects[0].description, dbegin: chosendefects[0].begin, dend: chosendefects[0].end }
               }
               $http(req).then(function(res) {
-                  itsok = true;
+                  chosendefects.splice(0,1);
+                  return $scope.sending(chosendefects);
               }, function(){
-                  itsok = false;
+                  return $scope.sending(chosendefects);
               });
+          } else {
+              return true;
           }
-          return itsok;
+      }
+      $scope.sendResults = function () {
+          return $scope.sending(defectList.get());
       }
       $scope.end = function () {
           $scope.wayOfTime = 0;
@@ -912,9 +962,7 @@ var app = angular.module('revision', ['ngRoute'])
               $location.path("/" + $scope.gameMode + "/result/" + $scope.gameID); //perhaps use the solution atempt id here
           } else if($scope.gameMode == "team") {
               var sent = false;
-              do {
-                  sent = $scope.sendResults();
-              } while (sent != true);
+              sent = $scope.sendResults();
               $location.path("/" + $scope.gameMode + "/meeting/wait/" + $scope.gameID); //perhaps use the solution atempt id here
           }
       }
