@@ -290,7 +290,7 @@ var app = angular.module('revision', ['ngRoute'])
                           case 6: myteam = 3;
                             break;
                       }
-                      cacheService.setData("team", myteam);
+                      cacheService.setData("team", myteam); console.log(cacheService.getData("team"));
                       $location.path("/");
                   } else {
                       $scope.error = "Login error";
@@ -448,6 +448,7 @@ var app = angular.module('revision', ['ngRoute'])
               $scope.myid = cacheService.getData("userid");
               $scope.myname = cacheService.getData("nameuser");
               $scope.myteam = cacheService.getData("team");
+              //console.log("a: " + cacheService.getData("team") + " : " + $scope.myteam);
           } else {
               $location.path("/login");
           }
@@ -513,31 +514,6 @@ var app = angular.module('revision', ['ngRoute'])
           }
       };
       $interval($scope.timer, 1000);
-      $scope.defects = defectList.get();
-
-      $scope.updateDefects = function () {
-          defectList.clearAll();
-          var req = {
-                  method: 'POST',
-                  url: 'http://revision-jpguimaraes.rhcloud.com/getdefectsmulti',
-                  data: { attempt: $scope.myteam}
-          }
-          $http(req).then(function(res) {
-              var userinfo = res.data;
-              if (userinfo.length > 0) {
-                  for (var i = 0; i < userinfo.length; i++) {
-                      var newdefect = new Defect(userinfo[i].defecttype,userinfo[i].dbegin,userinfo[i].dend,"",userinfo[i].description,$scope.myid);
-                      defectList.add(newdefect);
-                  }
-                  console.log("loaded");
-              } else {
-                  console.log("no defects");
-              }
-          }, function(){
-              console.log("Connection error");
-          });
-      }
-      $interval($scope.updateDefects, 5000);
       //console.log(jaccardIndex.common(newdefect,newdefect2));
       //console.log(jaccardIndex.union(newdefect,newdefect2));
       //console.log(jaccardIndex.calculate(newdefect,newdefect2));
@@ -553,7 +529,7 @@ var app = angular.module('revision', ['ngRoute'])
                       markcolor = 'rgba(255, 255, 0, ' + value + ')';
                   } else if (defectList.get()[i].type == 1) {
                       markcolor = 'rgba(255, 0, 0, ' + value + ')';
-                  }
+                  } 
                   marking.mark({target: 'code', begin: defectList.get()[i].begin, end: defectList.get()[i].end, color: markcolor});
               }
               i++;
@@ -564,7 +540,6 @@ var app = angular.module('revision', ['ngRoute'])
           $scope.markExistingDefects(false,0.2);
           $scope.markExistingDefects(true,0.5);
       }
-      $scope.markDefects();
       $scope.jumpToDefect = function (defectID) {
           $scope.markDefects();
           document.getElementById('a' + defectList.getByID(defectID).begin).scrollIntoView();
@@ -599,6 +574,32 @@ var app = angular.module('revision', ['ngRoute'])
               }
           }
       }
+      $scope.loadDefects = function () {
+          defectList.clearAll();
+          var req = {
+                  method: 'POST',
+                  url: 'http://revision-jpguimaraes.rhcloud.com/getdefectsmulti',
+                  data: { attempt: $scope.myteam }
+          }
+          $http(req).then(function(res) {
+              var userinfo = res.data;
+              if (userinfo.length > 0) {
+                  for (var i = 0; i < userinfo.length; i++) {
+                      var newdefect = new Defect(userinfo[i].defecttype,userinfo[i].dbegin,userinfo[i].dend,"",userinfo[i].description,$scope.myid);
+                      defectList.add(newdefect);
+                  }
+                  console.log("loaded " + defectList.get().length + " defects");
+                  $scope.markDefects();
+              } else {
+                  console.log("no defects");
+              }
+          }, function(){
+              console.log("Connection error");
+          });
+      }
+      $scope.loadDefects();
+      $scope.defects = defectList.get();
+
       $scope.captain = true;
       $scope.confirmEnd = function () {
           if (confirm("Do you want to end?")) {
@@ -606,15 +607,6 @@ var app = angular.module('revision', ['ngRoute'])
           }
           //$scope.captain = !($scope.captain);
       }
-      $scope.end = function () {
-          $scope.wayOfTime = 0;
-          $scope.ticking = false;
-          if($scope.captain) {
-            $scope.calculateResults();
-          }
-          //defectList.clearAll();
-          $location.path("/" + $scope.gameMode + "/result/wait/" + $scope.gameID); //perhaps use the solution atempt id here
-      } 
       $scope.calculateResults = function () {
           for(i = 0; i < defectList.get().length; i++) {
               if(!defectList.get()[i].active) {
@@ -678,7 +670,7 @@ var app = angular.module('revision', ['ngRoute'])
           }
           var finalscore = (currentscore + timebonus) / perfectscore; console.log(finalscore + " = " + currentscore + " + " + timebonus + " / " + perfectscore);
           finalscore = finalscore * 100;
-          var req = {
+          /*var req = {
                   method: 'POST',
                   url: 'http://revision-jpguimaraes.rhcloud.com/submitresults',
                   data: { team: $scope.myteam, classification: finalscore, seconds: timespent, hits: correctDefects.lentgh, missed: solutionDefects.length, incompleted: incompleteDefects.length, wrong: defectList.length}
@@ -692,8 +684,17 @@ var app = angular.module('revision', ['ngRoute'])
               }
           }, function(){
               console.log("Connection error");
-          });
+          });*/
       }
+      $scope.end = function () {
+          $scope.wayOfTime = 0;
+          $scope.ticking = false;
+          if($scope.captain) {
+            $scope.calculateResults();
+          }
+          //defectList.clearAll();
+          $location.path("/" + $scope.gameMode + "/result/wait/" + $scope.gameID); //perhaps use the solution atempt id here
+      } 
   }
 
   function gameCtrl ($scope, $interval, $routeParams, $location, $window, $http, gameSetup, defectList, Defect, cacheService, marking, jaccardIndex) {
