@@ -25,8 +25,8 @@
 				<td>{{result.misses}}</td>
 				<td>{{result.incomplete}}</td>
 				<td>{{result.wrong}}</td>
-				<td>{{result.seconds}}</td>
-				<td>{{result.classification}}</td>
+				<td>{{result.minutes}}m {{result.seconds % 60}}s ({{result.seconds}}s total)</td>
+				<td>{{result.classification / 100}}%</td>
 			</tr>
 		</table>
 	</div>
