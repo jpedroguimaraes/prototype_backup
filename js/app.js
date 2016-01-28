@@ -293,10 +293,10 @@ var app = angular.module('revision', ['ngRoute'])
                       cacheService.setData("team", myteam); console.log(cacheService.getData("team"));
                       cacheService.setData("captain", userinfo[0].captain);
                       if(cacheService.getData("captain") == true) {
-                        console.log("dá 1");
+                        console.log("dÃ¡ 1");
                       }
                       if(cacheService.getData("captain") == false) {
-                        console.log("dá 0");
+                        console.log("dÃ¡ 0");
                       }
                       $location.path("/");
                   } else {
@@ -411,14 +411,14 @@ var app = angular.module('revision', ['ngRoute'])
           var solutionDefects = []; 
           var newdefect0 = new Defect(0,'39','274',"",'Documentation',$scope.user);
           var newdefect1 = new Defect(0,'375','388',"",'Assignment/Initialization',$scope.user);
-          var newdefect2 = new Defect(0,'919','923',"",'Checking',$scope.user);
-          var newdefect3 = new Defect(0,'1144','1148',"",'Checking',$scope.user);
-          var newdefect4 = new Defect(0,'1319','1319',"",'Assignment/Initialization',$scope.user);
+          var newdefect2 = new Defect(1,'919','923',"",'Checking',$scope.user);
+          var newdefect3 = new Defect(1,'1144','1148',"",'Checking',$scope.user);
+          var newdefect4 = new Defect(1,'1319','1319',"",'Assignment/Initialization',$scope.user);
           var newdefect5 = new Defect(0,'1400','1400',"",'Assignment/Initialization',$scope.user);
           var newdefect6 = new Defect(0,'1400','1400',"",'Assignment/Initialization',$scope.user);
           var newdefect7 = new Defect(0,'1574','1575',"",'Assignment/Initialization',$scope.user);
-          var newdefect8 = new Defect(0,'1615','1655',"",'Checking',$scope.user);
-          var newdefect9 = new Defect(0,'1721','1721',"",'Algorythm',$scope.user);
+          var newdefect8 = new Defect(1,'1615','1655',"",'Checking',$scope.user);
+          var newdefect9 = new Defect(1,'1721','1721',"",'Algorythm',$scope.user);
           var newdefect10 = new Defect(0,'1759','1833',"",'Documentation',$scope.user);
           solutionDefects.push(newdefect0);
           solutionDefects.push(newdefect1);
@@ -697,14 +697,14 @@ var app = angular.module('revision', ['ngRoute'])
           var correctDefects = [];
           var newdefect0 = new Defect(0,'39','274',"",'Documentation',$scope.user);
           var newdefect1 = new Defect(0,'375','388',"",'Assignment/Initialization',$scope.user);
-          var newdefect2 = new Defect(0,'919','923',"",'Checking',$scope.user);
-          var newdefect3 = new Defect(0,'1144','1148',"",'Checking',$scope.user);
-          var newdefect4 = new Defect(0,'1319','1319',"",'Assignment/Initialization',$scope.user);
+          var newdefect2 = new Defect(1,'919','923',"",'Checking',$scope.user);
+          var newdefect3 = new Defect(1,'1144','1148',"",'Checking',$scope.user);
+          var newdefect4 = new Defect(1,'1319','1319',"",'Assignment/Initialization',$scope.user);
           var newdefect5 = new Defect(0,'1400','1400',"",'Assignment/Initialization',$scope.user);
           var newdefect6 = new Defect(0,'1400','1400',"",'Assignment/Initialization',$scope.user);
           var newdefect7 = new Defect(0,'1574','1575',"",'Assignment/Initialization',$scope.user);
-          var newdefect8 = new Defect(0,'1615','1655',"",'Checking',$scope.user);
-          var newdefect9 = new Defect(0,'1721','1721',"",'Algorythm',$scope.user);
+          var newdefect8 = new Defect(1,'1615','1655',"",'Checking',$scope.user);
+          var newdefect9 = new Defect(1,'1721','1721',"",'Algorythm',$scope.user);
           var newdefect10 = new Defect(0,'1759','1833',"",'Documentation',$scope.user);
           solutionDefects.push(newdefect0);
           solutionDefects.push(newdefect1);
@@ -749,15 +749,15 @@ var app = angular.module('revision', ['ngRoute'])
                   i--;
               }
           }
-          var percRemainingTime = $scope.time / 1800; 
-          var timespent = (900 - $scope.time) + $scope.teamtime;
+          var percRemainingTime = (1800 - 1695) / 1800; 
+          var timespent = 308 + 1695;
           if (percRemainingTime <= 0.5) {
               timebonus = timebonus * percRemainingTime * 2;
           }
           var finalscore = (currentscore + timebonus) / perfectscore; console.log(finalscore + " = " + currentscore + " + " + timebonus + " / " + perfectscore);
           finalscore = Math.round(finalscore * 10000);
           console.log($scope.myteam + " - " + finalscore + " - " + timespent + " - " + correctDefects.length + " - " + solutionDefects.length + " - " + incompleteDefects.length + " - " + defectList.get().length);
-          $scope.submitResults(finalscore, timespent, correctDefects.length, solutionDefects.length, incompleteDefects.length, defectList.get().length);
+          $scope.submitResults(finalscore, 2003, correctDefects.length, solutionDefects.length, incompleteDefects.length, defectList.get().length);
       }
       $scope.sending = function (chosendefects) {
           if (chosendefects.length > 0) {

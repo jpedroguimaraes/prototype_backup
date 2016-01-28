@@ -19,7 +19,7 @@
 				<td>Time</td>
 				<td>Score</td>
 			</tr>
-			<tr ng-repeat="result in results | orderBy:'classification'">
+			<tr ng-repeat="result in results | orderBy:'-classification'">
 				<td>{{result.id_team}}</td>
 				<td>{{result.hits}}</td>
 				<td>{{result.misses}}</td>
